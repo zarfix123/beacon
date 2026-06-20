@@ -1,0 +1,94 @@
+/* ============================================================
+   Beacon — base element styles & typography utilities
+   Lightweight resets + a small set of text-role classes that
+   map to the type tokens. Components rely mostly on tokens,
+   but these utilities keep specimen cards & kits consistent.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--body-size);
+  line-height: var(--body-lh);
+  color: var(--text-primary);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- Display (serif) ---- */
+.bc-display-hero {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular);
+  font-size: var(--display-hero-size);
+  line-height: var(--display-hero-lh);
+  letter-spacing: var(--display-hero-ls);
+}
+.bc-display-large {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular);
+  font-size: var(--display-large-size);
+  line-height: var(--display-large-lh);
+  letter-spacing: var(--display-large-ls);
+}
+.bc-display-medium {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-medium);
+  font-size: var(--display-medium-size);
+  line-height: var(--display-medium-lh);
+  letter-spacing: var(--display-medium-ls);
+}
+.bc-display-small {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular);
+  font-size: var(--display-small-size);
+  line-height: var(--display-small-lh);
+}
+
+/* ---- Sans headings ---- */
+.bc-heading {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-medium);
+  font-size: var(--sans-large-size);
+  line-height: var(--sans-large-lh);
+  letter-spacing: var(--sans-large-ls);
+}
+.bc-subheading {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-regular);
+  font-size: var(--subheading-size);
+  line-height: var(--subheading-lh);
+}
+
+/* ---- Body ---- */
+.bc-body  { font-size: var(--body-size); line-height: var(--body-lh); }
+.bc-body-sm { font-size: var(--body-small-size); line-height: var(--body-small-lh); }
+
+/* ---- Labels & overline ---- */
+.bc-label {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-medium);
+  font-size: var(--label-size);
+  line-height: var(--label-lh);
+  letter-spacing: var(--label-ls);
+}
+.bc-overline {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-semibold);
+  font-size: var(--overline-size);
+  line-height: var(--overline-lh);
+  letter-spacing: var(--overline-ls);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.bc-mono {
+  font-family: var(--font-mono);
+  font-size: var(--mono-size);
+  line-height: var(--mono-lh);
+  letter-spacing: 0;
+}
+
+a { color: var(--text-link); text-decoration: none; }
+a:hover { text-decoration: underline; }

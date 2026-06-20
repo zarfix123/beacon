@@ -1,0 +1,12 @@
+/* ============================================================
+   Beacon — Webfonts
+   SUBSTITUTION NOTE: The source extraction referenced
+   "HarveySerifFont" and "HarveySansFont", which are proprietary
+   and not available. Closest open substitutes are used here:
+     - Serif display  -> Newsreader      (transitional serif, optical display)
+     - Sans body/UI   -> Hanken Grotesk  (neutral humanist grotesque)
+     - Mono / data    -> JetBrains Mono  (agent traffic, IDs, code)
+   Swap these @font-face declarations if the real fonts arrive.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
