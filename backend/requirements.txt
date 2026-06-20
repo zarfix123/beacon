@@ -8,8 +8,8 @@ pydantic-settings
 anthropic>=0.40            # redaction / verification / synthesis Claude calls
 python-dotenv              # load ANTHROPIC_API_KEY in dev
 numpy                      # cosine math + embedding matrices
-sentence-transformers      # local all-MiniLM-L6-v2 embeddings (no key, deterministic) — chosen provider
-torch                      # sentence-transformers backend
+model2vec                  # static embeddings (potion-retrieval-32M) — numpy-only inference, NO torch
+rank-bm25                  # BM25 lexical channel for hybrid retrieval (RRF fusion)
 pytest                     # unit tests
 pytest-asyncio             # async orchestrator/router/verify tests
 # chromadb                 # OPTIONAL — not used; plain numpy is simpler for tiny corpora

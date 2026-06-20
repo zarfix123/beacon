@@ -1,32 +1,30 @@
 """Embedding function + model id + dimension (agents-corpus-index.md §2.2).
 
-Responsibility: one embedding function pair used to embed both corpus (offline /
-startup) and queries (real cosine search). NOT a Claude model — Anthropic has no
-embeddings endpoint. Default provider: local sentence-transformers all-MiniLM-L6-v2
-(no API key, deterministic, EMBED_DIM=384). EMBED_MODEL/EMBED_DIM are pinned in ONE
-place (OQ-7).
+Responsibility: one embedding-function pair used to embed both the corpus (offline /
+startup) and queries (the dense channel of retrieval). NOT a Claude model — Anthropic
+has no embeddings endpoint.
 
-`sentence-transformers` / `torch` are imported lazily on first use so the keyword-stub
-retrieval path (Phase 1) never pulls in torch.
+Provider: model2vec STATIC embeddings (`minishlab/potion-retrieval-32M`) — the best
+static retrieval model available, ~82% of all-MiniLM-L6-v2 retrieval quality at ~32MB
+with **numpy-only inference (no torch)**, so cold start is instant and the install is
+trivial. EMBED_MODEL/EMBED_DIM are pinned in ONE place (OQ-7). `model2vec` is imported
+lazily so the keyword-stub path never loads it.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import numpy as np
 
-if TYPE_CHECKING:
-    import numpy as np
+EMBED_MODEL = "minishlab/potion-retrieval-32M"   # static, numpy-only, no key (OQ-7)
+EMBED_DIM = 512                                   # potion-retrieval-32M output dim
 
-EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"   # local, no key (OQ-7)
-EMBED_DIM = 384                                          # uniform across all agents
-
-_MODEL = None   # lazily-loaded SentenceTransformer singleton
+_MODEL = None   # lazily-loaded model2vec StaticModel singleton
 
 
 def _get_model():
     global _MODEL
     if _MODEL is None:
-        from sentence_transformers import SentenceTransformer  # lazy: torch only here
-        _MODEL = SentenceTransformer(EMBED_MODEL)
+        from model2vec import StaticModel  # lazy: only the dense path pulls this in
+        _MODEL = StaticModel.from_pretrained(EMBED_MODEL)
     return _MODEL
 
 
@@ -36,8 +34,11 @@ def embed_texts(texts: list[str]) -> "np.ndarray":
     Vectors are L2-normalized so a dot product equals cosine similarity.
     """
     model = _get_model()
-    vecs = model.encode(texts, normalize_embeddings=True, convert_to_numpy=True)
-    return vecs.astype("float32")
+    vecs = np.asarray(model.encode(texts), dtype="float32")
+    if vecs.ndim == 1:
+        vecs = vecs.reshape(1, -1)
+    norms = np.linalg.norm(vecs, axis=1, keepdims=True)
+    return (vecs / np.clip(norms, 1e-9, None)).astype("float32")
 
 
 def embed_query(query: str) -> "np.ndarray":
