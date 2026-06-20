@@ -1,0 +1,15 @@
+# Relay backend — consolidated pip dependencies (BUILD_INDEX.md §5)
+# MVP scope: no DB, no auth, no Chroma (plain numpy over tiny corpora).
+
+fastapi
+uvicorn[standard]          # ASGI server + websockets extra
+pydantic>=2
+pydantic-settings
+anthropic>=0.40            # redaction / verification / synthesis Claude calls
+python-dotenv              # load ANTHROPIC_API_KEY in dev
+numpy                      # cosine math + embedding matrices
+sentence-transformers      # local all-MiniLM-L6-v2 embeddings (no key, deterministic) — chosen provider
+torch                      # sentence-transformers backend
+pytest                     # unit tests
+pytest-asyncio             # async orchestrator/router/verify tests
+# chromadb                 # OPTIONAL — not used; plain numpy is simpler for tiny corpora

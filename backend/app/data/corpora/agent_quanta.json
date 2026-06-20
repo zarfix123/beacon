@@ -1,0 +1,13 @@
+{
+  "_comment": "SKELETON seed for Quanta (data-model.md §2). TODO (build step 3): author 10-30 chunks, mixed tiers; include a private chunk so the denied badge is exercisable. embedding omitted (backfilled by scripts/build_embeddings.py).",
+  "chunks": [
+    {
+      "chunk_id": "quanta_c007",
+      "parent_doc_id": "quanta_d02",
+      "doc_title": "TODO private doc title",
+      "owner": "agent_quanta",
+      "visibility": "private",
+      "text": "TODO: private chunk payload (denied — no payload crosses)."
+    }
+  ]
+}

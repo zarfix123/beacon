@@ -1,0 +1,8 @@
+{
+  "_comment": "SKELETON seed: the 3 locked agents (data-model.md §1). ids frozen at hour 0; party_names illustrative. scope_policy is three_tier for MVP. TODO: tune party_names during seeding.",
+  "agents": [
+    { "id": "agent_northwind", "party_name": "Northwind Robotics", "scope_policy": "three_tier" },
+    { "id": "agent_helios", "party_name": "Helios Dynamics", "scope_policy": "three_tier" },
+    { "id": "agent_quanta", "party_name": "Quanta Systems", "scope_policy": "three_tier" }
+  ]
+}
