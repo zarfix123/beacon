@@ -4,16 +4,14 @@ Responsibility: unforgeable in-process capability tokens that declare which tier
 asker is entitled to RECEIVE. The gate checks the capability before deciding, so the
 asker can never receive a tier it wasn't granted, independent of visibility. Two
 independent gates (visibility policy AND capability) must both say "yes" for content
-to cross. This is a SKELETON — no logic.
+to cross.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Flag, auto
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from app.models import GateDecision
+from app.models import GateDecision
 
 
 class Capability(Flag):
@@ -35,16 +33,28 @@ class CapabilityGrant:
     capabilities: Capability      # bitmask of allowed tiers
 
 
+# What each decision requires the asker to hold. DENIED requires nothing (no payload).
+_REQUIRED: dict[GateDecision, Capability] = {
+    GateDecision.FULL: Capability.PUBLIC_READ,
+    GateDecision.REDACTED: Capability.RESTRICTED_REQUEST,
+}
+
+
 def issue_grant(for_agent_id: str) -> CapabilityGrant:
     """MVP issuer: every external asker gets PUBLIC_READ | RESTRICTED_REQUEST,
     never PRIVATE_READ. The SHAPE is real so the demo is not theatre."""
-    raise NotImplementedError("issue_grant is a skeleton stub")
+    return CapabilityGrant(
+        holder_agent_id=for_agent_id,
+        capabilities=Capability.PUBLIC_READ | Capability.RESTRICTED_REQUEST,
+    )
 
 
-def allows(grant: CapabilityGrant, decision: "GateDecision") -> bool:
+def allows(grant: CapabilityGrant, decision: GateDecision) -> bool:
     """Does this grant permit the asker to RECEIVE the given decision's output?
 
     full -> needs PUBLIC_READ; redacted -> needs RESTRICTED_REQUEST; denied ->
-    always allowed (carries no payload). Down-ranks to DENIED otherwise.
+    always allowed (carries no payload). The gate down-ranks to DENIED otherwise.
     """
-    raise NotImplementedError("allows is a skeleton stub")
+    if decision is GateDecision.DENIED:
+        return True
+    return bool(grant.capabilities & _REQUIRED[decision])

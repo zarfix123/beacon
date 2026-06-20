@@ -61,3 +61,49 @@ def real_registry():
     reg = build_registry(with_embeddings=False)
     search_module.set_registry(reg)
     return reg
+
+
+# ---- Claude client mocking (Phase 2) ----------------------------------------
+class _FakeBlock:
+    def __init__(self, type, text=None, input=None):
+        self.type = type
+        self.text = text
+        self.input = input
+
+
+class _FakeMessage:
+    def __init__(self, content, stop_reason="end_turn"):
+        self.content = content
+        self.stop_reason = stop_reason
+
+
+def make_fake_client(*, text=None, tool_input=None, stop_reason="end_turn", raises=None):
+    """Stand-in for AsyncAnthropic whose .messages.create returns a canned message (a
+    text block and/or a tool_use block), or raises. One client serves both
+    complete_text (reads the text block) and call_tool (reads the tool_use block)."""
+    from unittest.mock import AsyncMock, MagicMock
+
+    async def _create(**kwargs):
+        if raises is not None:
+            raise raises
+        blocks = []
+        if tool_input is not None:
+            blocks.append(_FakeBlock("tool_use", input=dict(tool_input)))
+        if text is not None:
+            blocks.append(_FakeBlock("text", text=text))
+        return _FakeMessage(blocks, stop_reason)
+
+    client = MagicMock()
+    client.messages.create = AsyncMock(side_effect=_create)
+    return client
+
+
+@pytest.fixture
+def patch_claude(monkeypatch):
+    """Install a fake Claude client for a test; returns the installer (call with
+    text= / tool_input= / stop_reason= / raises=). No API key / network needed."""
+    def _install(**kwargs):
+        client = make_fake_client(**kwargs)
+        monkeypatch.setattr("app.claude.client.get_client", lambda: client)
+        return client
+    return _install

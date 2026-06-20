@@ -1,21 +1,36 @@
-"""build_response_item: gate verdict + chunk -> ResponseItem (provenance-verification.md §2.4).
+"""Finalize a GatedResult into the wire ResponseItem (provenance-verification.md §2.4).
 
-Responsibility: turn one gated chunk into the canonical ResponseItem. Verifies ONLY
-`full` items (delegates to app.claude.verification.verify_answer); `redacted`/`denied`
-stay verified=False. Delegates the redacted gist to app.claude.redaction. Trusts the
-gate's `decision` and never re-reads visibility. This is a SKELETON — no logic.
+Single job: verify FULL items (delegates to app.claude.verification.verify_answer) and
+serialize. `redacted`/`denied` stay verified=False. Does NOT redact (the gate already
+did) and never re-reads visibility — the no-leak invariant is structural: a non-FULL
+GatedResult carries no raw text to begin with.
+
+Reconciliation note: takes the gate's GatedResult (not a bare `decision: str`) so the
+raw text is never in this function's hands for non-FULL items.
 """
 from __future__ import annotations
 
-from app.models import ResponseItem
+from dataclasses import replace
+from typing import Awaitable, Callable
+
+from app.claude.verification import verify_answer as _default_verify
+from app.models import GateDecision, GatedResult, ResponseItem, VerifyResult
+
+VerifyFn = Callable[[str, str], Awaitable[VerifyResult]]
 
 
-async def build_response_item(chunk: dict, decision: str) -> ResponseItem:
+async def build_response_item(
+    chunk: dict,
+    gated: GatedResult,
+    *,
+    verify_fn: VerifyFn = _default_verify,
+) -> ResponseItem:
     """Turn one gated chunk into the canonical Response item.
 
-    `decision` is the gate verdict (full|redacted|denied), already computed INSIDE
-    the responding agent. full -> assemble pointer + verify; redacted -> pointer +
-    redaction gist, verified=False; denied -> answer=None, payload hidden,
-    verified=False.
+    full -> verify the answer against its source (chunk text), set verified;
+    redacted/denied -> unchanged (verified stays False). Returns the 7-key wire dict.
     """
-    raise NotImplementedError("build_response_item is a skeleton stub")
+    if gated.decision is GateDecision.FULL and gated.answer is not None:
+        result = await verify_fn(gated.answer, chunk["text"])
+        gated = replace(gated, verified=result.verified)
+    return gated.to_wire()

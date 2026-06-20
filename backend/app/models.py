@@ -111,7 +111,15 @@ class GatedResult:
         is internal-only and NOT serialized; `type`/`query_id` are added by the API
         layer. `embedding`/`text` are structurally absent.
         """
-        raise NotImplementedError("GatedResult.to_wire is a skeleton stub")
+        return {
+            "answer": self.answer,
+            "source_party": self.source_party,
+            "source_doc_title": self.source_doc_title,
+            "decision": self.decision.value,
+            "verified": self.verified,
+            "chunk_id": self.chunk_id,
+            "source_agent_id": self.source_agent_id,
+        }
 
 
 # ---- provenance / verification shapes (provenance-verification.md §2.1) ------

@@ -3,7 +3,7 @@
 Responsibility: the visibility->decision mapping (data-model.md §4 reference table)
 as a PURE function — no Claude, no network, deterministic. The single source of truth
 for the mapping. Fail-closed: an unrecognized tier raises rather than defaulting to
-full. This is a SKELETON — no logic.
+full.
 """
 from __future__ import annotations
 
@@ -27,4 +27,10 @@ def decide(visibility: Visibility) -> GateDecision:
     Raises GateError on an unknown visibility value (fail-closed: an unrecognized
     tier is a hard error, never silently allowed through).
     """
-    raise NotImplementedError("policy.decide is a skeleton stub")
+    try:
+        return _VISIBILITY_TO_DECISION[visibility]
+    except KeyError as exc:
+        # Lazy import dodges the gate.gate <-> policy import cycle.
+        from app.gate.gate import GateError
+
+        raise GateError(f"unknown visibility tier: {visibility!r}") from exc
