@@ -18,3 +18,7 @@ venv/
 
 # Generated embedding cache
 **/embeddings.npz
+
+# Ingested seed corpora — derived from real private conversations. Local-only;
+# regenerate with scripts/ingest.py. Do NOT commit until reviewed + cleared.
+backend/app/data/corpora/*.json

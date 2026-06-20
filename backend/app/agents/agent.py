@@ -5,7 +5,6 @@ Responsibility: the runtime Agent object — identity (`id`, `party_name`,
 `.search()` (delegates to retrieval over its own index) and the `.respond(gate_fn)`
 seam the gate plugs into, so enforcement runs INSIDE the owning agent before content
 crosses the boundary (spec §3/§6). This file contains NO visibility->decision logic.
-This is a SKELETON — no logic.
 """
 from __future__ import annotations
 
@@ -27,7 +26,8 @@ class RuntimeAgent:
     def search(self, query: str, top_k: int = 5) -> list[Chunk]:
         """Retrieve over OWN index only. Delegates to search.search(query, self.id,
         top_k). Returns ALL tiers, ungated, with score (retrieve-first)."""
-        raise NotImplementedError("RuntimeAgent.search is a skeleton stub")
+        from app.retrieval.search import search  # local import avoids import cycle
+        return search(query, self.id, top_k)
 
     def respond(
         self,
@@ -37,5 +37,5 @@ class RuntimeAgent:
     ) -> list[ResponseItem]:
         """Seam for the GATE subsystem. retrieve-first, gate-second, IN this agent
         before anything crosses outward. This subsystem provides the seam + ordering;
-        it does NOT implement gate_fn."""
-        raise NotImplementedError("RuntimeAgent.respond is a skeleton stub")
+        it does NOT implement gate_fn (that arrives in Phase 2)."""
+        return [gate_fn(chunk, self) for chunk in self.search(query, top_k)]
