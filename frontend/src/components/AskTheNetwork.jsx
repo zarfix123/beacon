@@ -7,7 +7,9 @@ import NetworkConstellation from './NetworkConstellation.jsx'
 import AnswerPanel from './AnswerPanel.jsx'
 import AgentsReached from './AgentsReached.jsx'
 import PromptPill from './PromptPill.jsx'
+import { ResetIcon } from './icons.jsx'
 import { CONFIG, DECISION_COLORS, DEFAULT_QUESTION } from './mockData.js'
+import s from './AskTheNetwork.module.css'
 
 export default function AskTheNetwork() {
   const { liveAccent: accent, showLatency, scope: scopeLabel, autoExpandAgents: autoExpand } = CONFIG
@@ -46,7 +48,7 @@ export default function AskTheNetwork() {
     clearTimeout(rRef.current)
     rRef.current = setTimeout(() => {
       setRequesting(false); setGranted(true)
-      setExpanded((s) => ({ ...s, lyra: true }))
+      setExpanded((prev) => ({ ...prev, lyra: true }))
     }, 1150)
   }
 
@@ -56,7 +58,7 @@ export default function AskTheNetwork() {
     hRef.current = setTimeout(() => setHandedOff(false), 4500)
   }
 
-  const toggle = (k) => setExpanded((s) => ({ ...s, [k]: !(s[k] ?? autoExpand) }))
+  const toggle = (k) => setExpanded((prev) => ({ ...prev, [k]: !(prev[k] ?? autoExpand) }))
 
   const onQ = (e) => setQuestion(e.target.value)
   const onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); submit() } }
@@ -78,19 +80,19 @@ export default function AskTheNetwork() {
   }
 
   return (
-    <div style={{ width: '100%', height: '100vh', background: 'var(--ivory)', fontFamily: 'var(--font-sans)', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div className={s.app}>
       {/* ===== TOP BAR ===== */}
-      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 28px', borderBottom: '1px solid var(--border-subtle)', background: 'rgba(250,250,249,.8)', backdropFilter: 'blur(16px)', zIndex: 8, flex: 'none' }}>
-        <img src="/beacon-logo.png" alt="Beacon" style={{ height: 28, width: 'auto', display: 'block' }} />
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 11px', border: '1px solid var(--border-subtle)', borderRadius: 999, background: 'var(--surface-card)', whiteSpace: 'nowrap' }}>
-          <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--active-500)', animation: 'bc-glow 2s infinite ease-in-out' }} />
-          <span style={{ fontSize: 12, letterSpacing: '.6px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Online now</span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>1,248 agents reachable</span>
+      <header className={s.topbar}>
+        <img className={s.logo} src="/beacon-logo.png" alt="Beacon" />
+        <span className={s.status}>
+          <span className={s.statusDot} />
+          <span className={s.statusOnline}>Online now</span>
+          <span className={s.statusCount}>1,248 agents reachable</span>
         </span>
       </header>
 
       {/* ===== STAGE ===== */}
-      <div style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+      <div className={s.stage}>
         <NetworkConstellation isSearching={isSearching} accent={accent} colAtlas={colAtlas} colLyra={colLyra} colVega={colVega} />
 
         {isResults && <AnswerPanel granted={granted} handedOff={handedOff} onHandoff={handoff} />}
@@ -107,9 +109,9 @@ export default function AskTheNetwork() {
 
         {/* status pill (empty / searching) */}
         {!isResults && (
-          <div style={{ position: 'absolute', bottom: 108, left: 0, right: 0, display: 'flex', justifyContent: 'center', pointerEvents: 'none', zIndex: 5 }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '7px 15px', borderRadius: 999, background: 'rgba(255,255,255,.85)', backdropFilter: 'blur(10px)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', fontSize: 13 }}>
-              {isSearching && <span style={{ width: 7, height: 7, borderRadius: 999, background: accent, animation: 'bc-glow 1s infinite ease-in-out' }} />}
+          <div className={s.statusPillDock}>
+            <span className={s.statusPill}>
+              {isSearching && <span className={s.searchDot} style={{ background: accent }} />}
               {statusLine}
             </span>
           </div>
@@ -120,8 +122,8 @@ export default function AskTheNetwork() {
 
         {/* reset (results) */}
         {isResults && (
-          <button className="bc-reset" onClick={reset} style={{ position: 'absolute', bottom: 36, right: 24, zIndex: 7, display: 'inline-flex', alignItems: 'center', gap: 7, height: 34, padding: '0 13px', border: '1px solid var(--border-default)', borderRadius: 999, background: 'rgba(255,255,255,.9)', backdropFilter: 'blur(10px)', color: 'var(--text-secondary)', fontFamily: 'var(--font-sans)', fontSize: 12.5, cursor: 'pointer', transition: 'border-color 120ms' }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 4v4h4" /></svg>
+          <button className={s.reset} onClick={reset}>
+            <ResetIcon />
             Reset
           </button>
         )}

@@ -1,6 +1,8 @@
 // The radar/constellation network graph — center "You" + 3 agents (Atlas/Lyra/Vega),
 // concentric rings, a scattered background of reachable agents, and (while searching)
-// travelling packets + node pulses. Ported faithfully from the design's inline SVG.
+// travelling packets + node pulses. An SVG graphic; node/edge colors come from props.
+
+import s from './NetworkConstellation.module.css'
 
 // Background "reachable agents": [cx, cy, r, fillOpacity]. All fill #bbb6ae.
 const DOTS = [
@@ -40,8 +42,8 @@ const RINGS = [
 
 export default function NetworkConstellation({ isSearching, accent, colAtlas, colLyra, colVega }) {
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
-      <svg viewBox="0 0 640 470" width="100%" style={{ maxWidth: 720, maxHeight: '100%', overflow: 'visible' }} preserveAspectRatio="xMidYMid meet">
+    <div className={s.stage}>
+      <svg className={s.svg} viewBox="0 0 640 470" width="100%" preserveAspectRatio="xMidYMid meet">
         {/* radar rings */}
         {RINGS.map(([r, op], i) => (
           <circle key={i} cx="320" cy="235" r={r} fill="none" stroke="var(--border-default)" strokeOpacity={op} />
@@ -64,9 +66,9 @@ export default function NetworkConstellation({ isSearching, accent, colAtlas, co
             <circle r="3.5" fill={accent}><animateMotion dur="1s" repeatCount="indefinite"><mpath href="#e-atlas" /></animateMotion></circle>
             <circle r="3.5" fill={accent}><animateMotion dur="1s" begin="0.18s" repeatCount="indefinite"><mpath href="#e-lyra" /></animateMotion></circle>
             <circle r="3.5" fill={accent}><animateMotion dur="1s" begin="0.36s" repeatCount="indefinite"><mpath href="#e-vega" /></animateMotion></circle>
-            <circle cx="367" cy="90" r="18" fill={accent} style={{ transformBox: 'fill-box', transformOrigin: 'center', animation: 'bc-pulse 1.7s infinite ease-out' }} />
-            <circle cx="478" cy="286" r="18" fill={accent} style={{ transformBox: 'fill-box', transformOrigin: 'center', animation: 'bc-pulse 1.7s .28s infinite ease-out' }} />
-            <circle cx="181" cy="291" r="18" fill={accent} style={{ transformBox: 'fill-box', transformOrigin: 'center', animation: 'bc-pulse 1.7s .56s infinite ease-out' }} />
+            <circle className={s.pulse} cx="367" cy="90" r="18" fill={accent} />
+            <circle className={s.pulse} cx="478" cy="286" r="18" fill={accent} style={{ animationDelay: '.28s' }} />
+            <circle className={s.pulse} cx="181" cy="291" r="18" fill={accent} style={{ animationDelay: '.56s' }} />
           </>
         )}
 

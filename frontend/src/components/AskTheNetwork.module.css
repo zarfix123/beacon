@@ -1,0 +1,56 @@
+.app {
+  width: 100%;
+  height: 100vh;
+  background: var(--ivory);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(250, 250, 249, .8);
+  backdrop-filter: blur(16px);
+  z-index: 8;
+  flex: none;
+}
+.logo { height: 28px; width: auto; display: block; }
+.status {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 11px; border: 1px solid var(--border-subtle); border-radius: 999px;
+  background: var(--surface-card); white-space: nowrap;
+}
+.statusDot { width: 6px; height: 6px; border-radius: 999px; background: var(--active-500); animation: bc-glow 2s infinite ease-in-out; }
+.statusOnline { font-size: 12px; letter-spacing: .6px; text-transform: uppercase; color: var(--text-muted); }
+.statusCount { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+
+.stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+
+.statusPillDock {
+  position: absolute; bottom: 108px; left: 0; right: 0;
+  display: flex; justify-content: center; pointer-events: none; z-index: 5;
+}
+.statusPill {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 7px 15px; border-radius: 999px;
+  background: rgba(255, 255, 255, .85); backdrop-filter: blur(10px);
+  border: 1px solid var(--border-subtle); color: var(--text-secondary); font-size: 13px;
+}
+.searchDot { width: 7px; height: 7px; border-radius: 999px; animation: bc-glow 1s infinite ease-in-out; }
+
+.reset {
+  position: absolute; bottom: 36px; right: 24px; z-index: 7;
+  display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 13px;
+  border: 1px solid var(--border-default); border-radius: 999px;
+  background: rgba(255, 255, 255, .9); backdrop-filter: blur(10px);
+  color: var(--text-secondary); font-family: var(--font-sans); font-size: 12.5px;
+  cursor: pointer; transition: border-color 120ms;
+}
+.reset:hover { border-color: var(--border-strong); }

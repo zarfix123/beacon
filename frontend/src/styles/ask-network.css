@@ -1,40 +1,15 @@
 /* ============================================================
-   Ask the Network — screen-local animations & interaction rules.
-   Ported from the design's inline <style> block, plus the
-   :hover / :active rules that replace the design-canvas
-   `style-hover` / `style-active` attributes (React inline
-   styles cannot express pseudo-classes).
+   Global animations + base reset. Component styling lives in
+   co-located *.module.css files; only keyframes (referenced by
+   name across components) and the page reset stay global here.
    ============================================================ */
 
 html, body, #root { height: 100%; }
 
-/* ---- Keyframes (verbatim) ---- */
-@keyframes bc-pulse   { 0%{transform:scale(1);opacity:.5} 70%{transform:scale(2.6);opacity:0} 100%{opacity:0} }
-@keyframes bc-shimmer { 0%{background-position:-260px 0} 100%{background-position:300px 0} }
-@keyframes bc-glow    { 0%,100%{opacity:.4} 50%{opacity:.95} }
-@keyframes bc-spin    { to{transform:rotate(360deg)} }
+@keyframes bc-pulse { 0% { transform: scale(1); opacity: .5 } 70% { transform: scale(2.6); opacity: 0 } 100% { opacity: 0 } }
+@keyframes bc-glow  { 0%, 100% { opacity: .4 } 50% { opacity: .95 } }
+@keyframes bc-spin  { to { transform: rotate(360deg) } }
 
-/* ---- Utility / hover rules (verbatim) ---- */
-.bc-skel{ background:linear-gradient(90deg,#f2f1f0 25%,#e8e6e3 40%,#f2f1f0 60%); background-size:400px 100%; animation:bc-shimmer 1.25s infinite linear; border-radius:4px; }
-.bc-doc:hover{ color:var(--signal-700) !important; border-color:var(--signal-200) !important; background:var(--signal-50) !important; }
-.bc-row:hover{ border-color:var(--border-strong) !important; }
-.bc-prompt:focus-within{ border-color:var(--ink) !important; box-shadow:0 8px 28px rgba(15,14,13,.12) !important; }
-input.bc-q:focus{ outline:none; }
-input.bc-q::placeholder{ color:var(--text-muted); }
-
-/* ---- style-hover / style-active replacements ---- */
-.bc-btn-ink:hover{ background:var(--near-black); }
-.bc-btn-ink:active{ transform:scale(.98); }
-
-.bc-iconbtn-ink:not(:disabled):hover{ background:var(--near-black); }
-.bc-iconbtn-ink:not(:disabled):active{ transform:scale(.96); }
-
-.bc-btn-request:not(:disabled):hover{ background:#f6ead2; }
-.bc-btn-request:not(:disabled):active{ transform:scale(.97); }
-
-.bc-reset:hover{ border-color:var(--border-strong); }
-
-/* ---- Reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
 }

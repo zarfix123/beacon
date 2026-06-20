@@ -1,0 +1,21 @@
+.stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.svg {
+  max-width: 720px;
+  max-height: 100%;
+  overflow: visible;
+}
+
+/* search-state node pulse (delays applied inline per node) */
+.pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bc-pulse 1.7s infinite ease-out;
+}
