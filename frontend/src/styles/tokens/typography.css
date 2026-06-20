@@ -1,0 +1,65 @@
+/* ============================================================
+   Beacon — Typography tokens
+   Serif (Newsreader) for display & editorial headlines.
+   Sans (Hanken Grotesk) for body, UI, labels.
+   Mono (JetBrains Mono) for agent IDs, traffic, code.
+   Scale and metrics carried from the source extraction.
+   ============================================================ */
+
+:root {
+  /* ---- Families ---- */
+  --font-serif: 'Newsreader', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-sans:  'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-mono:  'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ---- Weights ---- */
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold:600;
+  --weight-bold:    700;
+
+  /* ---- Display (serif) ---- */
+  --display-hero-size:    72px;
+  --display-hero-lh:      75.6px;
+  --display-hero-ls:      -0.9px;
+
+  --display-large-size:   48px;
+  --display-large-lh:     50.4px;
+  --display-large-ls:     -0.48px;
+
+  --display-medium-size:  32px;
+  --display-medium-lh:    33.6px;
+  --display-medium-ls:    -0.32px;
+
+  --display-small-size:   28px;
+  --display-small-lh:     39.2px;
+  --display-small-ls:     normal; /* @kind other */
+
+  /* ---- Headings / sans large ---- */
+  --sans-large-size:      32px;
+  --sans-large-lh:        35.2px;
+  --sans-large-ls:        -0.32px;
+
+  --subheading-size:      20px;
+  --subheading-lh:        26px;
+
+  /* ---- Body ---- */
+  --body-size:            16px;
+  --body-lh:              24px;
+
+  --body-small-size:      14px;
+  --body-small-lh:        18.2px;
+
+  /* ---- Labels ---- */
+  --label-size:           14px;
+  --label-lh:             18.2px;
+  --label-ls:             -0.14px;
+
+  --overline-size:        12px;
+  --overline-lh:          16px;
+  --overline-ls:          0.6px;
+
+  /* ---- Mono ---- */
+  --mono-size:            13px;
+  --mono-lh:              20px;
+}

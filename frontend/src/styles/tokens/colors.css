@@ -1,0 +1,66 @@
+/* ============================================================
+   Beacon — Color tokens
+   Warm, near-monochrome ground (ivory → ink) carried over from
+   the source extraction, plus a single restrained Beacon "signal"
+   accent (amber) and a muted semantic set.
+   ============================================================ */
+
+:root {
+  /* ---- Base neutral ramp (warm grays) ---- */
+  --ivory:            #fafaf9; /* primary page background */
+  --warm-100:         #f2f1f0; /* subtle surface tint */
+  --warm-200:         #e8e6e3; /* hairline fills */
+  --stone-300:        #cccac6; /* borders, dividers */
+  --warm-mid:         #8f8b85; /* muted / secondary text */
+  --deep-gray:        #706d66; /* body-secondary text */
+  --charcoal:         #33312c; /* near-ink surfaces */
+  --near-black:       #1f1d1a; /* secondary dark surface */
+  --ink:              #0f0e0d; /* primary text & primary action */
+  --white:            #ffffff;
+
+  /* ---- Beacon signal accent (use sparingly) ---- */
+  --signal-50:        #fbf3e6;
+  --signal-200:       #ecd0a0;
+  --signal-500:       #b9802f; /* the beacon amber */
+  --signal-600:       #9c6a23;
+  --signal-700:       #7d531a;
+
+  /* ---- Status / semantic (muted, warm-leaning) ---- */
+  --active-500:       #3f7d57; /* agent online / live */
+  --active-50:        #e9f2ec;
+  --warn-500:         #b9802f; /* shares the signal amber */
+  --warn-50:          #fbf3e6;
+  --danger-500:       #a8392f; /* error / destructive */
+  --danger-50:        #f6e9e7;
+  --info-500:         #3a5f7d; /* informational */
+  --info-50:          #e8eef2;
+
+  /* ---- Semantic surface aliases ---- */
+  --surface-page:     var(--ivory);
+  --surface-card:     var(--white);
+  --surface-sunken:   var(--warm-100);
+  --surface-raised:   var(--white);
+  --surface-inverse:  var(--ink);
+  --surface-inverse-2:var(--near-black);
+
+  /* ---- Semantic text aliases ---- */
+  --text-primary:     var(--ink);
+  --text-secondary:   var(--deep-gray);
+  --text-muted:       var(--warm-mid);
+  --text-inverse:     var(--ivory);
+  --text-on-accent:   var(--white);
+  --text-link:        var(--signal-700);
+
+  /* ---- Semantic border aliases ---- */
+  --border-subtle:    var(--warm-200);
+  --border-default:   var(--stone-300);
+  --border-strong:    var(--charcoal);
+  --border-focus:     var(--ink);
+
+  /* ---- Action aliases ---- */
+  --action-primary:        var(--ink);
+  --action-primary-hover:  var(--near-black);
+  --action-accent:         var(--signal-500);
+  --action-accent-hover:   var(--signal-600);
+  --focus-ring:            var(--ink);
+}
