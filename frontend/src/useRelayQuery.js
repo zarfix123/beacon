@@ -6,8 +6,8 @@
  * exposes submit()/requestAccess()/reset(). Built straight to the frozen contract
  * (shared/contracts/api-websocket.md + backend app/api/schemas.py) — no mock parser.
  *
- * This hook is the CONTRACT between the data layer (Dennis) and the visual components
- * (Hao): swap a component's mock source for these fields and it renders live.
+ * This hook is the CONTRACT between the data layer and the visual components: swap a
+ * component's mock source for these fields and it renders live.
  *
  * Returned state:
  *   phase       'idle' | 'searching' | 'done'

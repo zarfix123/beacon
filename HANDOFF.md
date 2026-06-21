@@ -1,7 +1,7 @@
-# Handoff → Frontend integration (for Hao's agent)
+# Handoff → Frontend integration
 
 Read this first if you're wiring the Relay UI to the real backend. TL;DR: **the backend and
-the live data layer are done. Your job is to render the EXISTING components from one hook
+the live data layer are done. The job is to render the EXISTING components from one hook
 (`useRelayQuery`) instead of the `setTimeout`/`mockData.js` mocks.** Don't rebuild visuals,
 don't touch the backend.
 
@@ -12,7 +12,7 @@ don't touch the backend.
   Endpoints: `POST /query`, `WS /ws/query`, `POST /grant_access`, `GET /agents`, `GET /health`,
   `POST /demo/reset`.
 - **Live data layer** (`frontend/src/useRelayQuery.js`): owns the WebSocket, parses the real
-  event stream into the shape your components need. **This hook is the contract — consume it.**
+  event stream into the shape the components need. **This hook is the contract — consume it.**
 - **Working reference** (`frontend/src/components/LiveQueryDebug.jsx`): a barebones client at
   `http://localhost:5173/?debug` that already drives the full flow (query → cards → grant flip)
   off the hook. **Copy its consumption pattern.** This is the proven-correct example.
@@ -41,12 +41,12 @@ const r = useRelayQuery()
 // r.reset()                 // clear + re-arm demo tiers
 ```
 
-## Component-by-component swap (your files, your call)
+## Component-by-component swap (the visual files stay yours)
 
 | component | today (mock) | swap to |
 |---|---|---|
 | `AskTheNetwork.jsx` | `setTimeout` phase machine | `useRelayQuery()`; map `r.phase` → empty/searching/results; `submit`/`reset`/`requestAccess` |
-| `AgentsReached.jsx` | 3 hardcoded rows | render dynamic cards from `r.cards` (key by `chunk_id`); keep your decision→visual logic (full=green✓ / redacted=amber+lock+Request / denied=grey) |
+| `AgentsReached.jsx` | 3 hardcoded rows | render dynamic cards from `r.cards` (key by `chunk_id`); keep the decision→visual logic (full=green✓ / redacted=amber+lock+Request / denied=grey) |
 | `AnswerPanel.jsx` | hardcoded prose | `r.answer` + `r.provenance` (the `[n]` citations already line up 1:1 with `provenance` order — backend guarantees it) |
 | `NetworkConstellation.jsx` | Atlas/Lyra/Vega | map `r.agents` (+ `GET /agents`) → nodes; show real `party_name`; asker = "You" center |
 | `PromptPill.jsx` | already clean | wire `onSubmit` → `r.submit(question)` |
@@ -68,20 +68,20 @@ const r = useRelayQuery()
 
 ## How to test it
 
-The backend needs the (gitignored) corpora + an API key, which Dennis has. Two ways:
+The backend needs the (gitignored) corpora + an API key, which live on the backend host. Two ways:
 
-1. **Combine on one machine** (Dennis's): `cd backend && ./scripts/run.sh` launches backend
-   `:8000` + frontend `:5173`. Open `:5173/?debug` to confirm the live pipe works, then load
-   `:5173` and check your wired components against it.
-2. **Build against the contract first** (your machine, no backend): wire to the hook's shape +
+1. **Combine on one machine** (the backend host): `cd backend && ./scripts/run.sh` launches
+   backend `:8000` + frontend `:5173`. Open `:5173/?debug` to confirm the live pipe works, then
+   load `:5173` and check the wired components against it.
+2. **Build against the contract first** (no backend locally): wire to the hook's shape +
    `api-websocket.md`; verify live when you combine. The hook + `LiveQueryDebug` define the
    exact shapes, so this is safe.
 
-The three demo scenarios to make sure your UI handles (see `DEMO.md` for exact prompts):
-multi-hit (full + redacted + denied, grant flip), single-hit (one party), no-hit (zero cards).
+The three demo scenarios the UI must handle (see `DEMO.md` for exact prompts): multi-hit
+(full + redacted + denied, grant flip), single-hit (one party), no-hit (zero cards).
 
 ## After you pull
 
-`git pull` gets `useRelayQuery.js`, `LiveQueryDebug.jsx`, this file, and `DEMO.md`. Your
-existing components are untouched — they're yours to swap. Ping Dennis to run the combined
+`git pull` gets `useRelayQuery.js`, `LiveQueryDebug.jsx`, this file, and `DEMO.md`. The
+existing components are untouched — they're yours to swap. Coordinate to run the combined
 stack when you want to see it live.

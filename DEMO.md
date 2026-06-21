@@ -20,7 +20,7 @@ set in the environment, not just `.env`):
 | `RELAY_TOP_K` | `2` | each party returns only its top-2 (clean cards) |
 | `RELAY_MIN_SIM` | `0.35` | relevance floor → off-topic = no-hit, one-party = single-hit |
 
-- **UI:** http://localhost:5173 (Hao's shell) — or http://localhost:5173/?debug for the
+- **UI:** http://localhost:5173 (the visual shell) — or http://localhost:5173/?debug for the
   walking-skeleton client (raw event stream; the guaranteed-working fallback).
 - **Asker:** `agent_helios` (excluded from fan-out) → responders are **Northwind** + **Quanta**.
 
@@ -79,6 +79,6 @@ which gives three distinct behaviors:
 
 - Backend: `backend/app/` (gate, claude boundary calls, router/orchestrator, retrieval).
 - Planted demo scenario: `backend/app/demo.py` (single source of truth; `demo_seed.py` writes it to the gitignored corpora).
-- Live client contract: `frontend/src/useRelayQuery.js` (the hook Hao's components consume).
+- Live client contract: `frontend/src/useRelayQuery.js` (the hook the components consume).
 - Walking skeleton: `frontend/src/components/LiveQueryDebug.jsx` (at `?debug`).
 - Tuning: `RELAY_MIN_SIM` (floor), `RELAY_TOP_K` (cards per party) — tune in `run.sh` during rehearsal.
