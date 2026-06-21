@@ -1,11 +1,15 @@
-# Relay backend — consolidated pip dependencies (BUILD_INDEX.md §5)
+# Beacon backend — consolidated pip dependencies (BUILD_INDEX.md §5)
 # MVP scope: no DB, no auth, no Chroma (plain numpy over tiny corpora).
 
-fastapi
+# fastapi floor 0.115: the `mcp` SDK pulls in starlette>=1.x, which dropped the
+# `on_startup` kwarg that older fastapi (<=0.104) passes to starlette's Router.
+# fastapi>=0.115 no longer passes it, so the two coexist. See app/mcp/ (Phase 5).
+fastapi>=0.115
 uvicorn[standard]          # ASGI server + websockets extra
 pydantic>=2
-# pydantic-settings        # REMOVED: incompatible with pinned pydantic 2.5.0; app/config.py
-#                            uses a stdlib dataclass + manual .env loader instead.
+mcp>=1.28                  # MCP federation (Phase 5): FastMCP server + streamable-http client
+# pydantic-settings        # now present transitively (mcp depends on it); app/config.py
+#                            still uses its stdlib .env loader — no behavior change.
 anthropic>=0.40            # redaction / verification / synthesis Claude calls
 # python-dotenv            # not installed here; app/config.py + app/claude/client.py load .env manually
 numpy                      # cosine math + embedding matrices

@@ -67,7 +67,7 @@ class ResponseItem(TypedDict):
     """One party's gated answer for one chunk (data-model.md §4).
 
     Produced downstream by the gate; defined here for one source of truth. The five
-    canonical §8 fields plus the two transport additions for frontend wiring.
+    canonical §8 fields plus the two transport-id additions for frontend wiring.
     """
     answer: Optional[str]
     source_party: str
@@ -76,6 +76,11 @@ class ResponseItem(TypedDict):
     verified: bool
     chunk_id: str                         # transport addition (grant_access handle)
     source_agent_id: str                  # transport addition (owning Agent.id)
+    # Federation tag (Phase 5): how this item reached the asker — "mcp" (served over a real
+    # MCP server), "fallback" (MCP call failed/timed out → local), or "local" (in-process).
+    # Stamped by the MCP dispatcher (app/mcp/client.py); absent on items that never pass
+    # through it (e.g. pure-local test paths). NotRequired so existing producers are unaffected.
+    transport: NotRequired[Literal["mcp", "fallback", "local"]]
 
 
 # ---- gate shapes (permission-gate.md §2.1) ----------------------------------

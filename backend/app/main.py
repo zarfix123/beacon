@@ -10,7 +10,9 @@ modules. Run target: `uvicorn app.main:app --reload --port 8000`.
 """
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
+import logging
+import os
+from contextlib import asynccontextmanager, AsyncExitStack
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,10 +27,13 @@ from app.grant_access.service import GrantAccessService
 from app.retrieval import search as search_module
 from app.router.router import Router
 from app.router.responder import respond_for_agent, set_registry as set_responder_registry
+from app.mcp.client import connect_mcp, make_mcp_responder, make_dispatch_responder
 from app.api import http as http_routes
 from app.api import ws as ws_routes
 from app.api import meta as meta_routes
 from app.grant_access import routes as grant_access_routes
+
+_log = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -37,7 +42,7 @@ async def lifespan(app: FastAPI):
 
     1. load settings;
     2. build the registry (3 isolated AgentIndex objects, isolation asserted);
-    3. wire search (set the registry on retrieval.search; RELAY_SEARCH selects backend);
+    3. wire search (set the registry on retrieval.search; BEACON_SEARCH selects backend);
     4. build the event plumbing (one EventBus, one WSManager subscribing per query_id);
     5. build the Router (respond_for_agent injected) + Orchestrator + RunRegistry +
        GrantAccessService; stash all into app.state;
@@ -48,7 +53,7 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
 
     # ---- 2. registry (3 isolated agents) ----
-    registry = build_registry(with_embeddings=settings.relay_search in ("cosine", "hybrid"))
+    registry = build_registry(with_embeddings=settings.beacon_search in ("cosine", "hybrid"))
 
     # ---- 3. wire search + responder (both need the registry: search for chunks,
     #         responder for party_name resolution on the gated items) ----
@@ -63,12 +68,36 @@ async def lifespan(app: FastAPI):
         except Exception:
             pass
 
+    # ---- 3b. MCP federation (Phase 5) — optionally serve some parties over a real MCP server.
+    # BEACON_MCP_AGENTS (comma-separated agent_ids) + BEACON_MCP_URL turn it on; BEACON_MCP=off forces
+    # all-local. The dispatcher routes those parties over MCP and everyone else stays local; ANY
+    # connect/call failure falls back to the in-process responder — the demo is never at the mercy
+    # of the MCP server. `app.state.mcp_agents` drives the GET /agents "via MCP" badge.
+    responder_fn = respond_for_agent
+    mcp_agents: set[str] = set()
+    app.state.mcp_stack = None
+    mcp_url = os.getenv("BEACON_MCP_URL", "").strip()
+    mcp_agent_ids = [a.strip() for a in os.getenv("BEACON_MCP_AGENTS", "").split(",") if a.strip()]
+    if os.getenv("BEACON_MCP", "").lower() != "off" and mcp_url and mcp_agent_ids:
+        stack = AsyncExitStack()
+        try:
+            session = await connect_mcp(stack, mcp_url)
+            mcp_map = {aid: make_mcp_responder(session, aid) for aid in mcp_agent_ids}
+            responder_fn = make_dispatch_responder(respond_for_agent, mcp_map)
+            mcp_agents = set(mcp_agent_ids)
+            app.state.mcp_stack = stack
+            _log.info("MCP federation active: %s via %s", ", ".join(mcp_agent_ids), mcp_url)
+        except Exception as exc:                      # server down/unreachable -> all-local
+            await stack.aclose()
+            _log.warning("MCP connect to %s failed (%s); serving all parties locally", mcp_url, exc)
+    app.state.mcp_agents = mcp_agents
+
     # ---- 4. event plumbing ----
     bus = EventBus()
     ws_manager = WSManager(bus)
 
     # ---- 5. router + orchestrator + run registry + grant-access service ----
-    router = Router(registry=registry, bus=bus, responder=respond_for_agent)
+    router = Router(registry=registry, bus=bus, responder=responder_fn)
 
     async def _emit(event: dict) -> None:
         # Orchestrator/router emit into the bus; the WSManager pump forwards to sockets.
@@ -95,13 +124,17 @@ async def lifespan(app: FastAPI):
     app.state.grant_access_service = grant_access_service
 
     yield
-    # Nothing to tear down for the MVP (in-process, no external connections).
+
+    # ---- shutdown: close the MCP client session/transport if we opened one ----
+    stack = getattr(app.state, "mcp_stack", None)
+    if stack is not None:
+        await stack.aclose()
 
 
 def create_app() -> FastAPI:
     """Construct the FastAPI app: lifespan, CORS, and mounted routers."""
     settings = get_settings()
-    app = FastAPI(title="Relay Backend", lifespan=lifespan)
+    app = FastAPI(title="Beacon Backend", lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
