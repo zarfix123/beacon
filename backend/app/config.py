@@ -37,7 +37,13 @@ class Settings:
     """Process-wide settings. Defaults below; env overrides applied in get_settings()."""
 
     cors_origins: list[str] = field(
-        default_factory=lambda: ["http://localhost:5173", "http://localhost:3000"]
+        # localhost vite drifts across 5173-5176 when ports are taken; allow the range so the
+        # browser's grant_access / demo/reset POSTs aren't blocked wherever the UI lands.
+        default_factory=lambda: [
+            "http://localhost:5173", "http://localhost:5174",
+            "http://localhost:5175", "http://localhost:5176",
+            "http://localhost:3000",
+        ]
     )
     agents_path: str = "app/data/agents.json"
     corpora_dir: str = "app/data/corpora"

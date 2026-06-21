@@ -1,14 +1,12 @@
 /* ============================================================
-   Global animations + base reset. Component styling lives in
-   co-located *.module.css files; only keyframes (referenced by
-   name across components) and the page reset stay global here.
+   Base reset + global reduced-motion guard.
+   NOTE: animation @keyframes live in the *.module.css that use them.
+   CSS Modules scopes animation names, so a keyframe defined here
+   (global) cannot be referenced from a module by name — the module
+   rewrites `bc-x` to a scoped `_bc-x_hash` that wouldn't match.
    ============================================================ */
 
 html, body, #root { height: 100%; }
-
-@keyframes bc-pulse { 0% { transform: scale(1); opacity: .5 } 70% { transform: scale(2.6); opacity: 0 } 100% { opacity: 0 } }
-@keyframes bc-glow  { 0%, 100% { opacity: .4 } 50% { opacity: .95 } }
-@keyframes bc-spin  { to { transform: rotate(360deg) } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }

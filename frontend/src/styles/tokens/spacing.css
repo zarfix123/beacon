@@ -20,11 +20,19 @@
   --nav-padding:        32px;
   --top-page-spacing:   66px;
 
-  /* ---- Radius ---- */
-  --radius-sm:   4px;  /* subtle corner: inputs, tags, chips */
-  --radius-md:   8px;  /* control corner: buttons, cards */
-  --radius-lg:   12px; /* large surfaces, dialogs */
+  /* ---- Radius (one documented scale, applied everywhere) ----
+     panels/cards = lg · rows/buttons/inputs/drawers = md ·
+     small inline chips (cite/num/doc) = sm · pills/avatars/dots = pill */
+  --radius-sm:   4px;  /* small inline chips */
+  --radius-md:   8px;  /* rows, buttons, inputs */
+  --radius-lg:   12px; /* panels, cards, dialogs */
   --radius-pill: 999px;
+
+  /* ---- Z-index scale (documented; no ad-hoc values) ---- */
+  --z-chrome:  8; /* topbar */
+  --z-control: 7; /* prompt dock, reset */
+  --z-panel:   6; /* answer / agents panels */
+  --z-hint:    5; /* passive status pill */
 
   /* ---- Borders ---- */
   --border-hairline: 1px;

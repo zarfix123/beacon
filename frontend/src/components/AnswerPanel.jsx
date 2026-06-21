@@ -1,10 +1,11 @@
-// Top-left: the synthesized answer with inline numbered citations, a per-source
-// provenance list, and the "Hand off to Claude Code" action. Appears in the results phase.
+// Top-left: the synthesized answer (live r.answer, streamed token-by-token) with inline
+// numbered [n] citations that line up 1:1 with r.provenance, a collapsible source list
+// (count pill → popover), and an Expand control that opens a right-half "reader" slide-over
+// for long answers. Appears in the results phase.
 
-import { CheckIcon, LockIcon, HandoffIcon } from './icons.jsx'
+import { useState, useEffect, useRef } from 'react'
+import { CheckIcon, LockIcon, HandoffIcon, ExpandIcon, CloseIcon } from './icons.jsx'
 import s from './AnswerPanel.module.css'
-
-const NBSP = ' '
 
 function Cite({ children, lock }) {
   return lock ? (
@@ -14,48 +15,94 @@ function Cite({ children, lock }) {
   )
 }
 
-export default function AnswerPanel({ granted, handedOff, onHandoff }) {
+// Split a synthesized answer string into text + citation tokens on [n] markers.
+function splitCitations(text) {
+  const parts = []
+  const re = /\[(\d+)\]/g
+  let last = 0, m
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push({ t: 'text', v: text.slice(last, m.index) })
+    parts.push({ t: 'cite', n: Number(m[1]) })
+    last = m.index + m[0].length
+  }
+  if (last < text.length) parts.push({ t: 'text', v: text.slice(last) })
+  return parts
+}
+
+function AnswerText({ answer, provenance }) {
+  return splitCitations(answer || '').map((part, i) =>
+    part.t === 'text'
+      ? <span key={i}>{part.v}</span>
+      : <Cite key={i} lock={provenance[part.n - 1]?.decision === 'redacted'}>{part.n}</Cite>
+  )
+}
+
+function ProvenanceRows({ provenance }) {
+  return provenance.map((p, i) => (
+    <div key={i} className={s.sourceRow}>
+      <span className={p.decision === 'redacted' ? s.numLock : s.num}>{i + 1}</span>
+      <span className={p.decision === 'denied' ? s.partyMuted : s.party}>{p.source_party}</span>
+      <span className={p.decision === 'redacted' ? s.pathRestricted : s.path}>
+        {p.source_doc_title || (p.decision === 'redacted' ? 'restricted' : '—')}
+      </span>
+      <span className={s.right}>
+        {p.verified ? <CheckIcon /> : p.decision === 'redacted' ? <LockIcon size={11} /> : null}
+      </span>
+    </div>
+  ))
+}
+
+export default function AnswerPanel({ answer, provenance = [], handedOff, onHandoff }) {
+  const [showSources, setShowSources] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const inlineRef = useRef(null)
+  const readerRef = useRef(null)
+
+  // close the citations popover on any outside click
+  useEffect(() => {
+    if (!showSources) return
+    const close = () => setShowSources(false)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [showSources])
+
+  // Esc closes the reader
+  useEffect(() => {
+    if (!expanded) return
+    const onKey = (e) => { if (e.key === 'Escape') setExpanded(false) }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [expanded])
+
+  // follow the streaming answer to the bottom (inline + reader)
+  useEffect(() => {
+    for (const el of [inlineRef.current, readerRef.current]) {
+      if (el) el.scrollTop = el.scrollHeight
+    }
+  }, [answer, expanded])
+
   return (
     <div className={s.wrap}>
       <div className={s.card}>
         <div className={s.eyebrowRow}>
-          <span className={s.live} />
           <span className={s.eyebrow}>Synthesized answer</span>
+          <div className={s.eyebrowActions}>
+            {provenance.length > 0 && (
+              <div className={s.citeAnchor} onClick={(e) => e.stopPropagation()}>
+                <button className={s.sourcesPill} onClick={() => setShowSources((v) => !v)} aria-expanded={showSources}>
+                  {provenance.length} {provenance.length === 1 ? 'source' : 'sources'}
+                </button>
+                {showSources && <div className={s.popover}><ProvenanceRows provenance={provenance} /></div>}
+              </div>
+            )}
+            <button className={s.expandBtn} onClick={() => setExpanded(true)} aria-label="Expand answer">
+              <ExpandIcon />
+            </button>
+          </div>
         </div>
 
-        <p className={s.prose}>
-          The 429s trace to two throttles on the payments path. Atlas lowered the gateway limit to <b className={s.semibold}>60{NBSP}req/min</b> for the retry-queue refactor<Cite>1</Cite>, reverting at 16:00.
-          {granted && <> auth-core caps token issuance at <b className={s.semibold}>30{NBSP}req/min</b> per service<Cite>2</Cite> — raise it for headroom.</>}
-          {!granted && <> auth-core also throttles this path, but the threshold is <span className={s.muted}>access-scoped</span><Cite lock>2</Cite>.</>}
-        </p>
-
-        <div className={s.sources}>
-          {/* source 1 — Atlas (always full) */}
-          <div className={s.sourceRow}>
-            <span className={s.num}>1</span>
-            <span className={s.party}>Atlas</span>
-            <span className={s.path}>billing-svc/RetryPolicy.md</span>
-            <span className={s.right}><CheckIcon /></span>
-          </div>
-
-          {/* source 2 — Lyra (redacted → full when granted) */}
-          <div className={s.sourceRow}>
-            {granted ? (
-              <>
-                <span className={s.num}>2</span>
-                <span className={s.party}>Lyra</span>
-                <span className={s.path}>auth-core/throttle.yaml</span>
-                <span className={s.right}><CheckIcon /></span>
-              </>
-            ) : (
-              <>
-                <span className={s.numLock}>2</span>
-                <span className={s.partyMuted}>Lyra</span>
-                <span className={s.pathRestricted}>auth-core · restricted</span>
-                <span className={s.right}><LockIcon size={11} /></span>
-              </>
-            )}
-          </div>
+        <div className={s.proseScroll} ref={inlineRef}>
+          <p className={s.prose}><AnswerText answer={answer} provenance={provenance} /></p>
         </div>
 
         <div className={s.footer}>
@@ -64,11 +111,30 @@ export default function AnswerPanel({ granted, handedOff, onHandoff }) {
           </button>
           {handedOff ? (
             <div className={s.confirm}>
-              <span className={s.noShrink}><CheckIcon size={15} stroke="#2c5d40" /></span>
-              <span className={s.confirmText}>Context packaged — opening in Claude Code.</span>
+              <span className={s.noShrink}><CheckIcon size={15} stroke="var(--active-700)" /></span>
+              <span className={s.confirmText}>Context packaged. Opening in Claude Code.</span>
             </div>
           ) : (
             <p className={s.hint}>Carries this answer and its cited sources in as context.</p>
+          )}
+        </div>
+      </div>
+
+      {/* right-half slide-over reader for long answers (always mounted; slides via class) */}
+      <div className={`${s.reader}${expanded ? ` ${s.readerOpen}` : ''}`} aria-hidden={!expanded}>
+        <div className={s.readerHead}>
+          <span className={s.eyebrow}>Synthesized answer</span>
+          <button className={s.readerClose} onClick={() => setExpanded(false)} aria-label="Close reader">
+            <CloseIcon />
+          </button>
+        </div>
+        <div className={s.readerBody} ref={readerRef}>
+          <p className={s.readerProse}><AnswerText answer={answer} provenance={provenance} /></p>
+          {provenance.length > 0 && (
+            <div className={s.readerSources}>
+              <div className={s.readerSourcesLabel}>Sources</div>
+              <ProvenanceRows provenance={provenance} />
+            </div>
           )}
         </div>
       </div>

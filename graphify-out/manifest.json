@@ -1,4 +1,44 @@
 {
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/vite.config.js": {
+    "mtime": 1781989970.497012,
+    "hash": "c2788ad88c1239dd29d07f31ee6c6504"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/src/main.jsx": {
+    "mtime": 1781989970.4949458,
+    "hash": "1924482cfd08d2de8b0921c2da2bfbc8"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/src/App.jsx": {
+    "mtime": 1781989970.491825,
+    "hash": "f0657c9ed5554da441d783139bd41f27"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/src/components/icons.jsx": {
+    "mtime": 1781998777.1734412,
+    "hash": "527e4f5005b8aa0b64c0ab22d46d0056"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/src/components/AgentsReached.jsx": {
+    "mtime": 1782001467.831428,
+    "hash": "f64e61e1bebf33c5dafc2f2bbc590d7e"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/src/components/AnswerPanel.jsx": {
+    "mtime": 1782005872.6693242,
+    "hash": "4114e21fdced76f720762ddf977d7567"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/src/components/NetworkConstellation.jsx": {
+    "mtime": 1782005707.781079,
+    "hash": "89a7b16657ecb0d4caaa4602ab01a4ff"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/src/components/mockData.js": {
+    "mtime": 1781998738.0905128,
+    "hash": "62e7e13ee9dc005e580e95e7e7d9dbf5"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/src/components/PromptPill.jsx": {
+    "mtime": 1781993113.8062863,
+    "hash": "afd9e4e48accb703e4a97dd35411e17b"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/src/components/AskTheNetwork.jsx": {
+    "mtime": 1782005723.9639428,
+    "hash": "1988447dab7c3e316851cfce08904744"
+  },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/deps.py": {
     "mtime": 1781986936.874912,
     "hash": "2356ebf0257458d6d109027698ead351"
@@ -8,8 +48,8 @@
     "hash": "7ea16db3de33e41bef6a178e546a4ca0"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/models.py": {
-    "mtime": 1781986936.877416,
-    "hash": "3b8e83eef99643691dca46edb88b695b"
+    "mtime": 1781993171.4101954,
+    "hash": "e79b872b2f7c62d6bfa4b2327fd1e881"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/__init__.py": {
     "mtime": 1781986936.868773,
@@ -44,88 +84,88 @@
     "hash": "306de67865027aa34d534a96f0337bed"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/claude/redaction.py": {
-    "mtime": 1781986936.8730094,
-    "hash": "f8abadbd0a29596bf7cf0cb049fead81"
+    "mtime": 1781993171.4086819,
+    "hash": "b60201a9e5d38ff1e88b578273cff794"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/claude/verification.py": {
-    "mtime": 1781986936.8732486,
-    "hash": "c607fb7e8235eeff6095e4bae8f518b6"
+    "mtime": 1781993171.4089077,
+    "hash": "ae599fbb7a2e79961f12163cc173409c"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/claude/client.py": {
-    "mtime": 1781986936.8727722,
-    "hash": "e455057590a0674ddae0d7a422c5256c"
+    "mtime": 1781993171.4081972,
+    "hash": "cd98ddcab537aca26b6e865f242d31c9"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/claude/__init__.py": {
     "mtime": 1781986936.8726442,
     "hash": "0db18d986f2e833f6cf13b91298ec50f"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/claude/prompts.py": {
-    "mtime": 1781986936.8728855,
-    "hash": "bd6cdb363cf3b9a72c2caab2659421de"
+    "mtime": 1781993171.4084451,
+    "hash": "1340e5094d5e7db354ff0721d7584f5e"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/claude/synthesis.py": {
     "mtime": 1781986936.8731322,
     "hash": "1e615a090292663f3f7da7bb40453502"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/agents/index.py": {
-    "mtime": 1781986936.8700678,
-    "hash": "779e93c7325ab818153063c72378031f"
+    "mtime": 1781989597.692039,
+    "hash": "9f8641fb8814c11fcbb8f7b04bea1db9"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/agents/registry.py": {
-    "mtime": 1781986936.870301,
-    "hash": "05118c81ffb0b0166e381bfcfce541bb"
+    "mtime": 1781989597.6924062,
+    "hash": "8664600a1ac771228e8d054e2c29c4be"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/agents/__init__.py": {
     "mtime": 1781986936.869124,
     "hash": "8e2df4f04e2e3587cc16c68622405b28"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/agents/embeddings.py": {
-    "mtime": 1781986936.8698134,
-    "hash": "b138f6d2680cbef37c4f44b8c43237f5"
+    "mtime": 1781991743.295861,
+    "hash": "7393687171318d15dddff5524fee119d"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/agents/agent.py": {
-    "mtime": 1781986936.8694553,
-    "hash": "49f9177cc65b5e579c99d92986876fcf"
+    "mtime": 1781989597.690885,
+    "hash": "66f0a45aab7829c8d8c8cdf61323c178"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/agents/corpus.py": {
-    "mtime": 1781986936.869646,
-    "hash": "21330a6432d28e2a97dd0750580e625b"
+    "mtime": 1781989597.6913075,
+    "hash": "325e748be952659e662a44e6445444c9"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/retrieval/__init__.py": {
     "mtime": 1781986936.8784497,
     "hash": "e6fafb7ff1b24cf0347f99bee7e06c4b"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/retrieval/search.py": {
-    "mtime": 1781986936.878705,
-    "hash": "0d947930cd2ba3dec0817e83fb7f56e7"
+    "mtime": 1781991743.2962909,
+    "hash": "3983766d93618e60324ab6c279f9ccf8"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/provenance/__init__.py": {
     "mtime": 1781986936.8779056,
     "hash": "f98f5f01d77cb0c207482479917bef8b"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/provenance/assembler.py": {
-    "mtime": 1781986936.878026,
-    "hash": "ed791e7595bfb5e450c97ccafd632104"
+    "mtime": 1781993171.4104605,
+    "hash": "5bba85f264aeb2cb64475b4ffca4ed7b"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/provenance/pointer.py": {
-    "mtime": 1781986936.8782103,
-    "hash": "abf7be1415c75b502907ad8cd05fb7d4"
+    "mtime": 1781993171.4106953,
+    "hash": "60c9458eb245d7e9a360d2eacaf46977"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/gate/policy.py": {
-    "mtime": 1781986936.87634,
-    "hash": "12a087d5e6fd0bf438e56895bc430f7b"
+    "mtime": 1781993171.4096138,
+    "hash": "cd2c85b6d6ce43e0c38bfbdf0e8004ba"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/gate/__init__.py": {
     "mtime": 1781986936.875885,
     "hash": "1eb852354d7b51413e1c0360b286c52e"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/gate/capability.py": {
-    "mtime": 1781986936.8760114,
-    "hash": "fef3b50e7c672fe212a16d16dd91836c"
+    "mtime": 1781993171.4091516,
+    "hash": "10f2efda1a6f2b81effa311e7e96e8fb"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/gate/gate.py": {
-    "mtime": 1781986936.876139,
-    "hash": "e1150b71c4461f277a68ef60e0ac0f49"
+    "mtime": 1781993171.409379,
+    "hash": "69edc197b0f4c4f70a6da8a9decf42c9"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/api/events.py": {
     "mtime": 1781986936.8716152,
@@ -176,76 +216,104 @@
     "hash": "93e9ad9ffbf6e273da2d00eeff0ec25a"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/app/router/responder.py": {
-    "mtime": 1781986936.8795247,
-    "hash": "829c889ac41d9e72e50f20dbf54c7d76"
+    "mtime": 1781993171.4110248,
+    "hash": "11bcde0ea7a298fd77c450eefdd62f1f"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_provenance.py": {
-    "mtime": 1781986936.8854494,
-    "hash": "af32a9e4747076a10d8cfda7906e88d8"
+    "mtime": 1781993171.4129143,
+    "hash": "926f4d0b8c1d95f39716345e32b18330"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_hybrid_search.py": {
+    "mtime": 1781991743.2973688,
+    "hash": "adf4e85f9617330b2a72169906b04c6f"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/conftest.py": {
-    "mtime": 1781986936.8845494,
-    "hash": "b348b5d0a3b5dcac06dcf617e463b584"
+    "mtime": 1781993171.4117851,
+    "hash": "43bca44be429cb34565e7835db73f75f"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_gate_leakage.py": {
-    "mtime": 1781986936.8846583,
-    "hash": "b6a1a301c78d2df6001016374410ef91"
+    "mtime": 1781993171.4120479,
+    "hash": "f30690d26936edd7730bf77b53d9595b"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_router.py": {
     "mtime": 1781986936.885694,
     "hash": "e2c1fcd2cde8db91fe32d40b1710e7c2"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_responder.py": {
+    "mtime": 1781993171.4133573,
+    "hash": "f60e9cd8e78d826d047cb7287379b3ef"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/__init__.py": {
     "mtime": 1781986936.8844392,
     "hash": "ee7bc93299345601f7c0f0eea05caddc"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_search_stub.py": {
-    "mtime": 1781986936.8857973,
-    "hash": "fe850cd56ff46d24e526644d3d642105"
+    "mtime": 1781989597.6950371,
+    "hash": "e4ef09e8799ce84a661ef4a0a627b8e3"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_orchestrator.py": {
     "mtime": 1781986936.8853083,
     "hash": "08dde078edf796acc984532ca8d08f0e"
   },
+  "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_live.py": {
+    "mtime": 1781993171.4124587,
+    "hash": "4d7aba61453f88b39a90fc597b3aa897"
+  },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_models.py": {
-    "mtime": 1781986936.8851798,
-    "hash": "3ef6c6e757c48173155dbe28af160e3f"
+    "mtime": 1781989597.6945639,
+    "hash": "4178cdff61002f66ab76fc5a23c356da"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_isolation.py": {
-    "mtime": 1781986936.885023,
-    "hash": "7419d9132fbef0f9094adf34b2827c6a"
+    "mtime": 1781989597.69421,
+    "hash": "5a87cb1a3b71b746b592d3180a1e0e41"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_redaction.py": {
-    "mtime": 1781986936.885581,
-    "hash": "c488334202fc0471290c7994d917e0a5"
+    "mtime": 1781993171.413177,
+    "hash": "7d13f11241f4315767a44f8f3df2c77b"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_gate_policy.py": {
-    "mtime": 1781986936.8847868,
-    "hash": "c3b92f4af63235aac0aabe3d8558a67c"
+    "mtime": 1781993171.4122775,
+    "hash": "8912697f5ccfce4af91555d2fce051fc"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_grant_access.py": {
     "mtime": 1781986936.884907,
     "hash": "5520e43291130d6bcdef430de19cb395"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/tests/test_verification.py": {
-    "mtime": 1781986936.8859181,
-    "hash": "ca5b213c4df9c6eb614ec07f6df1802f"
+    "mtime": 1781993171.4135866,
+    "hash": "6062f14e7ae74ee92ae6a16105b6d9a5"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/backend/scripts/ingest.py": {
+    "mtime": 1781989597.693196,
+    "hash": "57174499477092218ede67c4640c8125"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/scripts/build_embeddings.py": {
-    "mtime": 1781986936.8842604,
-    "hash": "48e1ea9b2606c458f64d277e796c8d9b"
+    "mtime": 1781991743.2969294,
+    "hash": "a1b4a3224872eee2c39e52c4fafefb76"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/backend/scripts/tier.py": {
+    "mtime": 1781989597.693423,
+    "hash": "3b13a336c2e76afc4afbd8c63a93dc36"
   },
   "/Users/hlin/Documents/badminton/code/beacon/README.md": {
     "mtime": 1781986936.866907,
     "hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/index.html": {
+    "mtime": 1781989970.4902651,
+    "hash": "a387e6347bc010f3741343d32309474b"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/README.md": {
+    "mtime": 1781989970.4900134,
+    "hash": "16f8e98f8130ae057268b76ed0249eb7"
+  },
   "/Users/hlin/Documents/badminton/code/beacon/backend/requirements.txt": {
-    "mtime": 1781986936.8840685,
-    "hash": "07f9fd11dbcbd3677431f46b31e047d0"
+    "mtime": 1781991743.2966013,
+    "hash": "796cd1792e198a8a1f7fb918b4af059c"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/README.md": {
-    "mtime": 1781986936.8684323,
-    "hash": "a0ef4cce1573add32106ad445b742d0e"
+    "mtime": 1781991879.579984,
+    "hash": "b5a5621542b1c9d78f3d63191ae8dbdb"
   },
   "/Users/hlin/Documents/badminton/code/beacon/backend/BUILD_INDEX.md": {
     "mtime": 1781986936.8679423,
@@ -298,5 +366,17 @@
   "/Users/hlin/Documents/badminton/code/beacon/docs/relay-spec.md": {
     "mtime": 1781986936.886285,
     "hash": "ebd0a06e25bcd777e7e5eda691990afd"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/docs/superpowers/plans/2026-06-20-beacon-glow-background.md": {
+    "mtime": 1782003927.7802336,
+    "hash": "3979c333d6020e3e3a1361ce0000dd2a"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/docs/superpowers/specs/2026-06-20-beacon-glow-background-design.md": {
+    "mtime": 1782003719.852433,
+    "hash": "33ef4a840405964b033dfa99dac099f9"
+  },
+  "/Users/hlin/Documents/badminton/code/beacon/frontend/public/beacon-logo.png": {
+    "mtime": 1781989970.4913673,
+    "hash": "68f88b329ae04bd728954b76cc64340b"
   }
 }

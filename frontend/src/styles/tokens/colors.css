@@ -1,35 +1,43 @@
 /* ============================================================
    Beacon — Color tokens
-   Warm, near-monochrome ground (ivory → ink) carried over from
-   the source extraction, plus a single restrained Beacon "signal"
-   accent (amber) and a muted semantic set.
+   Cool-neutral ground (slate-tinted off-white → near-black ink)
+   with a single sharp Beacon "signal" accent (electric blue).
+   Permission status is a separate semantic set: green = full,
+   amber = redacted, grey = denied. Amber lives ONLY in --warn-*
+   (decoupled from the brand signal so it means exactly one thing).
+   Note: the --warm-* / --stone-* names are retained for stability;
+   the ramp itself is now cool-neutral.
    ============================================================ */
 
 :root {
-  /* ---- Base neutral ramp (warm grays) ---- */
-  --ivory:            #fafaf9; /* primary page background */
-  --warm-100:         #f2f1f0; /* subtle surface tint */
-  --warm-200:         #e8e6e3; /* hairline fills */
-  --stone-300:        #cccac6; /* borders, dividers */
-  --warm-mid:         #8f8b85; /* muted / secondary text */
-  --deep-gray:        #706d66; /* body-secondary text */
-  --charcoal:         #33312c; /* near-ink surfaces */
-  --near-black:       #1f1d1a; /* secondary dark surface */
-  --ink:              #0f0e0d; /* primary text & primary action */
+  /* ---- Base neutral ramp (cool-neutral) ---- */
+  --ivory:            #f8f9fb; /* primary page background */
+  --warm-100:         #eef0f4; /* subtle surface tint */
+  --warm-200:         #e2e5ea; /* hairline fills */
+  --stone-300:        #c7ccd4; /* borders, dividers */
+  --warm-mid:         #848a94; /* muted / secondary text */
+  --deep-gray:        #5f636c; /* body-secondary text */
+  --charcoal:         #2a2d33; /* near-ink surfaces */
+  --near-black:       #191b1f; /* secondary dark surface */
+  --ink:              #0d0e11; /* primary text & primary action */
   --white:            #ffffff;
 
-  /* ---- Beacon signal accent (use sparingly) ---- */
-  --signal-50:        #fbf3e6;
-  --signal-200:       #ecd0a0;
-  --signal-500:       #b9802f; /* the beacon amber */
-  --signal-600:       #9c6a23;
-  --signal-700:       #7d531a;
+  /* ---- Beacon signal accent (electric blue, use sparingly) ---- */
+  --signal-50:        #ebf1ff;
+  --signal-200:       #b4ccff;
+  --signal-500:       #2f6bff; /* the beacon signal */
+  --signal-600:       #1f56e6;
+  --signal-700:       #1a44c0;
 
-  /* ---- Status / semantic (muted, warm-leaning) ---- */
-  --active-500:       #3f7d57; /* agent online / live */
+  /* ---- Status / semantic ---- */
+  --active-500:       #3f7d57; /* agent online / live / full access */
   --active-50:        #e9f2ec;
-  --warn-500:         #b9802f; /* shares the signal amber */
+  --active-700:       #2c5d40; /* full-access text on light */
+  --warn-500:         #b9802f; /* redacted (amber, decoupled from signal) */
+  --warn-200:         #ecd0a0;
   --warn-50:          #fbf3e6;
+  --warn-600:         #9c6a23;
+  --warn-700:         #7d531a;
   --danger-500:       #a8392f; /* error / destructive */
   --danger-50:        #f6e9e7;
   --info-500:         #3a5f7d; /* informational */

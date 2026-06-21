@@ -1,6 +1,6 @@
 .app {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   background: var(--ivory);
   font-family: var(--font-sans);
   color: var(--text-primary);
@@ -16,9 +16,9 @@
   justify-content: space-between;
   padding: 14px 28px;
   border-bottom: 1px solid var(--border-subtle);
-  background: rgba(250, 250, 249, .8);
+  background: rgba(248, 249, 251, .8);
   backdrop-filter: blur(16px);
-  z-index: 8;
+  z-index: var(--z-chrome);
   flex: none;
 }
 .logo { height: 28px; width: auto; display: block; }
@@ -35,22 +35,31 @@
 
 .statusPillDock {
   position: absolute; bottom: 108px; left: 0; right: 0;
-  display: flex; justify-content: center; pointer-events: none; z-index: 5;
+  display: flex; justify-content: center; pointer-events: none; z-index: var(--z-hint);
 }
 .statusPill {
   display: inline-flex; align-items: center; gap: 9px;
   padding: 7px 15px; border-radius: 999px;
   background: rgba(255, 255, 255, .85); backdrop-filter: blur(10px);
   border: 1px solid var(--border-subtle); color: var(--text-secondary); font-size: 13px;
+  animation: bc-rise var(--dur-base) var(--ease-out) both;
 }
 .searchDot { width: 7px; height: 7px; border-radius: 999px; animation: bc-glow 1s infinite ease-in-out; }
 
 .reset {
-  position: absolute; bottom: 36px; right: 24px; z-index: 7;
+  position: absolute; bottom: 36px; right: 24px; z-index: var(--z-control);
   display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 13px;
   border: 1px solid var(--border-default); border-radius: 999px;
   background: rgba(255, 255, 255, .9); backdrop-filter: blur(10px);
   color: var(--text-secondary); font-family: var(--font-sans); font-size: 12.5px;
-  cursor: pointer; transition: border-color 120ms;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out);
+  /* tail of the staggered results reveal (after answer + agents panels).
+     Entrance owns `transform`, so hover uses border-color only to avoid a cascade fight. */
+  animation: bc-rise var(--dur-slow) var(--ease-out) 140ms both;
 }
 .reset:hover { border-color: var(--border-strong); }
+
+/* keyframes co-located so CSS Modules scopes name + reference together */
+@keyframes bc-glow { 0%, 100% { opacity: .4 } 50% { opacity: .95 } }
+@keyframes bc-rise { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }

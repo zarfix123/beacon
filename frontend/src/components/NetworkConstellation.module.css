@@ -13,9 +13,69 @@
   overflow: visible;
 }
 
-/* search-state node pulse (delays applied inline per node) */
-.pulse {
+/* whole scene zooms + recenters on a focused node (transform in viewBox coords) */
+.scene {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* status color eases between idle → searching → results instead of snapping */
+.nodeBase { transition: fill 600ms var(--ease-out, ease); }
+.edge { transition: stroke 600ms var(--ease-out, ease); }
+
+/* in-transit signal: a bright segment travels each curve */
+/* a bright light segment travels You → node and loops (the "signal in transit") */
+.flow {
+  stroke-dasharray: 0.13 0.87;
+  stroke-dashoffset: 1;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px currentColor) drop-shadow(0 0 2px currentColor);
+  animation: bc-flow 1.4s linear infinite;
+}
+
+/* soft arrival glow breathing behind each agent node */
+.halo {
   transform-box: fill-box;
   transform-origin: center;
-  animation: bc-pulse 1.7s infinite ease-out;
+  filter: blur(7px);
+  animation: bc-halo 1.9s ease-in-out infinite;
 }
+
+/* keyframes co-located here so CSS Modules scopes name + reference together */
+@keyframes bc-flow { to { stroke-dashoffset: 0 } }
+@keyframes bc-halo { 0%, 100% { opacity: .12 } 50% { opacity: .5 } }
+
+/* resting beacon glow: a calm centered bloom that breathes slowly.
+   opacity-only animation so it degrades to a still, visible glow under reduced motion */
+.glow {
+  opacity: 0.5;
+  animation: bc-breathe 6s ease-in-out infinite;
+}
+
+@keyframes bc-breathe { 0%, 100% { opacity: .42 } 50% { opacity: .6 } }
+
+/* searching: the bloom swells brighter (defined after .glow so it wins the cascade) */
+.glowSearching { animation: bc-breathe-on 1.9s ease-in-out infinite; }
+@keyframes bc-breathe-on { 0%, 100% { opacity: .8 } 50% { opacity: 1 } }
+
+/* one-shot "verdict landing" glow as each node resolves to its decision color
+   (staggered left→right). opacity/transform only → neutralized under reduced motion */
+.land {
+  transform-box: fill-box;
+  transform-origin: center;
+  filter: blur(6px);
+  animation: bc-land 820ms var(--ease-out, ease) both;
+}
+@keyframes bc-land {
+  0%   { opacity: 0; transform: scale(.55) }
+  35%  { opacity: .5 }
+  100% { opacity: 0; transform: scale(1.5) }
+}
+
+/* mother-node satellites: a small decision-colored dot per source when a party returns
+   multiple cards. Fade in as they resolve; recolor smoothly on a grant-access flip. */
+.sat { animation: bc-satin 360ms var(--ease-out, ease) both; }
+.satDot { transition: fill 380ms var(--ease-out, ease); }
+@keyframes bc-satin { from { opacity: 0 } to { opacity: 1 } }

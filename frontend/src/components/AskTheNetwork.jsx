@@ -1,8 +1,9 @@
-// "Ask the Network" — the main Beacon screen. Holds the empty → searching → results
-// state machine (today driven by setTimeout mocks; later by the backend WebSocket) and
-// lays out the constellation, answer panel, agents panel, prompt, and reset.
+// "Ask the Network" — the main Beacon screen. Drives the constellation, answer panel,
+// agents panel, and prompt from the live backend via useRelayQuery (one consumer; the
+// visual children stay presentational). phase idle|searching|done → empty|searching|results.
 
 import { useEffect, useRef, useState } from 'react'
+import { useRelayQuery } from '../useRelayQuery.js'
 import NetworkConstellation from './NetworkConstellation.jsx'
 import AnswerPanel from './AnswerPanel.jsx'
 import AgentsReached from './AgentsReached.jsx'
@@ -11,73 +12,122 @@ import { ResetIcon } from './icons.jsx'
 import { CONFIG, DECISION_COLORS, DEFAULT_QUESTION } from './mockData.js'
 import s from './AskTheNetwork.module.css'
 
+const decisionColor = (d) => DECISION_COLORS[d] || DECISION_COLORS.idle
+const letterOf = (name) => ((name || '?').trim()[0] || '?').toUpperCase()
+
+// A party can own several cards with mixed decisions. Node color = most-restricted
+// UNRESOLVED state, so granting the last redacted card visibly flips the node to green.
+function partyDecision(cards) {
+  if (cards.some((c) => c.decision === 'redacted')) return 'redacted'
+  if (cards.some((c) => c.decision === 'full')) return 'full'
+  if (cards.some((c) => c.decision === 'denied')) return 'denied'
+  return 'idle'
+}
+
 export default function AskTheNetwork() {
-  const { liveAccent: accent, showLatency, scope: scopeLabel, autoExpandAgents: autoExpand } = CONFIG
+  const { liveAccent: accent, scope: scopeLabel } = CONFIG
+  const r = useRelayQuery()
 
-  const [phase, setPhase] = useState('empty') // empty | searching | results
-  const [granted, setGranted] = useState(false)
-  const [requesting, setRequesting] = useState(false)
-  const [handedOff, setHandedOff] = useState(false)
-  const [expanded, setExpanded] = useState({})
   const [question, setQuestion] = useState(DEFAULT_QUESTION)
+  const [expanded, setExpanded] = useState({})            // by chunk_id
+  const [focus, setFocus] = useState(null)                // zoomed agent_id (mirrors open row)
+  const [requestingChunkId, setRequestingChunkId] = useState(null)
+  const [handedOff, setHandedOff] = useState(false)
+  const hRef = useRef()
+  useEffect(() => () => clearTimeout(hRef.current), [])
 
-  const tRef = useRef(), rRef = useRef(), hRef = useRef()
-  const clearTimers = () => { clearTimeout(tRef.current); clearTimeout(rRef.current); clearTimeout(hRef.current) }
-  useEffect(() => clearTimers, [])
+  const isEmpty = r.phase === 'idle'
+  const isSearching = r.phase === 'searching'
+  // 'synthesizing' = fan-out done, answer streaming → show the results panels and let r.answer grow live
+  const isResults = r.phase === 'synthesizing' || r.phase === 'done'
 
-  const isEmpty = phase === 'empty'
-  const isSearching = phase === 'searching'
-  const isResults = phase === 'results'
+  // clear the per-card "requesting" spinner once that card has flipped to full
+  useEffect(() => {
+    if (!requestingChunkId) return
+    const c = r.cards.find((c) => c.chunk_id === requestingChunkId)
+    if (c && c.decision === 'full') setRequestingChunkId(null)
+  }, [r.cards, requestingChunkId])
 
   const submit = () => {
-    if (isSearching) return
-    clearTimers()
-    setPhase('searching'); setGranted(false); setRequesting(false); setHandedOff(false); setExpanded({})
-    tRef.current = setTimeout(() => setPhase('results'), 1900)
+    if (isSearching || !question.trim()) return
+    setExpanded({}); setFocus(null); setRequestingChunkId(null); setHandedOff(false)
+    r.submit(question)
   }
-
   const reset = () => {
-    clearTimers()
-    setPhase('empty'); setGranted(false); setRequesting(false); setHandedOff(false); setExpanded({})
+    setExpanded({}); setFocus(null); setRequestingChunkId(null); setHandedOff(false)
+    r.reset()
   }
-
-  const request = (e) => {
-    if (e && e.stopPropagation) e.stopPropagation()
-    if (requesting || granted) return
-    setRequesting(true)
-    clearTimeout(rRef.current)
-    rRef.current = setTimeout(() => {
-      setRequesting(false); setGranted(true)
-      setExpanded((prev) => ({ ...prev, lyra: true }))
-    }, 1150)
+  const request = (chunkId) => {
+    if (requestingChunkId) return
+    const card = r.cards.find((c) => c.chunk_id === chunkId)
+    setRequestingChunkId(chunkId)
+    if (card) setFocus(card.source_agent_id) // zoom to the party as the request travels
+    r.requestAccess(chunkId)
   }
-
   const handoff = () => {
     setHandedOff(true)
     clearTimeout(hRef.current)
     hRef.current = setTimeout(() => setHandedOff(false), 4500)
   }
-
-  const toggle = (k) => setExpanded((prev) => ({ ...prev, [k]: !(prev[k] ?? autoExpand) }))
+  const toggle = (chunkId) => {
+    const card = r.cards.find((c) => c.chunk_id === chunkId)
+    const willOpen = !expanded[chunkId]
+    setExpanded((prev) => ({ ...prev, [chunkId]: willOpen }))
+    if (card) setFocus((f) => (willOpen ? card.source_agent_id : f === card.source_agent_id ? null : f))
+  }
+  // click the center "You" node while zoomed → collapse that party's rows + zoom out
+  const clearFocus = () => {
+    if (!focus) return
+    const ids = r.cards.filter((c) => c.source_agent_id === focus).map((c) => c.chunk_id)
+    setExpanded((prev) => { const n = { ...prev }; ids.forEach((id) => { n[id] = false }); return n })
+    setFocus(null)
+  }
 
   const onQ = (e) => setQuestion(e.target.value)
   const onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); submit() } }
 
-  // decision → color (every edge/node goes accent while searching)
-  const idle = DECISION_COLORS.idle
-  const dec = (d) => (isSearching ? accent : isResults ? DECISION_COLORS[d] : idle)
-  const colAtlas = dec('full')
-  const colLyra = dec(granted ? 'full' : 'redacted')
-  const colVega = dec('denied')
+  // ----- view-models derived from the live hook -----
+  const cardsFor = (agentId) => r.cards.filter((c) => c.source_agent_id === agentId)
+  const agents = [...r.agents].sort((a, b) => (a.agent_id < b.agent_id ? -1 : a.agent_id > b.agent_id ? 1 : 0))
+  const nodes = agents.map((a) => {
+    const pc = cardsFor(a.agent_id)
+    return {
+      agentId: a.agent_id,
+      label: a.party_name,
+      letter: letterOf(a.party_name),
+      color: isResults ? decisionColor(partyDecision(pc)) : accent,
+      // per-source breakdown for the mother-node satellites (one dot per card, decision-colored)
+      cards: pc.map((c) => ({ chunkId: c.chunk_id, decision: c.decision, color: decisionColor(c.decision) })),
+    }
+  })
+  const requestingAgentId = requestingChunkId
+    ? r.cards.find((c) => c.chunk_id === requestingChunkId)?.source_agent_id ?? null
+    : null
 
-  const reachLine = granted ? '2 full · 1 denied' : '1 full · 1 scoped · 1 denied'
+  const cards = r.cards
+    .map((c) => ({
+      chunkId: c.chunk_id,
+      agentId: c.source_agent_id,
+      party: c.source_party,
+      letter: letterOf(c.source_party),
+      decision: c.decision,
+      answer: c.answer,
+      docTitle: c.source_doc_title,
+      verified: c.verified,
+      color: decisionColor(c.decision),
+    }))
+    .sort((a, b) => (a.agentId < b.agentId ? -1 : a.agentId > b.agentId ? 1 : 0))
+
+  const counts = r.cards.reduce((m, c) => ((m[c.decision] = (m[c.decision] || 0) + 1), m), {})
+  const reachLine = cards.length
+    ? [['full', 'full'], ['redacted', 'scoped'], ['denied', 'denied']]
+        .filter(([k]) => counts[k]).map(([k, lbl]) => `${counts[k]} ${lbl}`).join(' · ')
+    : 'no replies'
+
+  const reached = nodes.length
+  const statusCount = isEmpty ? 'Network online' : `${reached} ${reached === 1 ? 'agent' : 'agents'} reached`
+  const subtitle = reached ? `${reached} in range` : ''
   const statusLine = isEmpty ? 'Ask a question to light up the network' : 'Querying agents across the network…'
-  const requestLabel = requesting ? 'Requesting…' : 'Request access'
-  const expandedOpen = {
-    atlas: expanded.atlas ?? autoExpand,
-    lyra: expanded.lyra ?? autoExpand,
-    vega: expanded.vega ?? autoExpand,
-  }
 
   return (
     <div className={s.app}>
@@ -85,25 +135,27 @@ export default function AskTheNetwork() {
       <header className={s.topbar}>
         <img className={s.logo} src="/beacon-logo.png" alt="Beacon" />
         <span className={s.status}>
-          <span className={s.statusDot} />
-          <span className={s.statusOnline}>Online now</span>
-          <span className={s.statusCount}>1,248 agents reachable</span>
+          <span className={s.statusDot} style={r.connected ? undefined : { background: 'var(--warm-mid)', animation: 'none' }} />
+          <span className={s.statusOnline}>{r.connected ? 'Online now' : 'Connecting…'}</span>
+          <span className={s.statusCount}>{statusCount}</span>
         </span>
       </header>
 
       {/* ===== STAGE ===== */}
       <div className={s.stage}>
-        <NetworkConstellation isSearching={isSearching} accent={accent} colAtlas={colAtlas} colLyra={colLyra} colVega={colVega} />
+        <NetworkConstellation
+          isSearching={isSearching} isResults={isResults} accent={accent}
+          nodes={nodes} requestingAgentId={requestingAgentId} subtitle={subtitle}
+          focus={focus} onClearFocus={clearFocus}
+        />
 
-        {isResults && <AnswerPanel granted={granted} handedOff={handedOff} onHandoff={handoff} />}
+        {isResults && <AnswerPanel answer={r.answer} provenance={r.provenance} handedOff={handedOff} onHandoff={handoff} />}
 
         {isResults && (
           <AgentsReached
-            colAtlas={colAtlas} colLyra={colLyra} colVega={colVega}
-            granted={granted} requesting={requesting} requestLabel={requestLabel}
-            showLatency={showLatency} reachLine={reachLine} expanded={expandedOpen}
-            onToggleAtlas={() => toggle('atlas')} onToggleLyra={() => toggle('lyra')} onToggleVega={() => toggle('vega')}
-            onRequest={request}
+            cards={cards} reachLine={reachLine} expanded={expanded}
+            requestingChunkId={requestingChunkId} focus={focus}
+            onToggle={toggle} onRequest={request}
           />
         )}
 

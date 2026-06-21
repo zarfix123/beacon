@@ -1,51 +1,56 @@
-# Graph Report - /Users/hlin/Documents/badminton/code/beacon  (2026-06-20)
+# Graph Report - beacon  (2026-06-20)
 
 ## Corpus Check
-- Corpus is ~49,080 words - fits in a single context window. You may not need a graph.
+- 74 files · ~62,284 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 520 nodes · 603 edges · 53 communities detected
-- Extraction: 72% EXTRACTED · 28% INFERRED · 0% AMBIGUOUS · INFERRED: 166 edges (avg confidence: 0.79)
-- Token cost: 288,384 input · 0 output
+- 774 nodes · 1072 edges · 61 communities detected
+- Extraction: 77% EXTRACTED · 23% INFERRED · 0% AMBIGUOUS · INFERRED: 244 edges (avg confidence: 0.78)
+- Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `bf7380d5`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Capability Gate & App Wiring|Capability Gate & App Wiring]]
-- [[_COMMUNITY_WebSocket Manager & Config|WebSocket Manager & Config]]
-- [[_COMMUNITY_Permission Gate Package|Permission Gate Package]]
-- [[_COMMUNITY_Boundary Pipeline & Claude Helpers|Boundary Pipeline & Claude Helpers]]
-- [[_COMMUNITY_API Endpoints & Frozen Contracts|API Endpoints & Frozen Contracts]]
-- [[_COMMUNITY_Shared Data Models|Shared Data Models]]
-- [[_COMMUNITY_Agent Isolation & Runtime|Agent Isolation & Runtime]]
-- [[_COMMUNITY_Corpus Loading & Embeddings|Corpus Loading & Embeddings]]
-- [[_COMMUNITY_Grant-Access & Wire Schemas|Grant-Access & Wire Schemas]]
-- [[_COMMUNITY_Router Fan-Out & Events|Router Fan-Out & Events]]
-- [[_COMMUNITY_Runtime Agent & Index|Runtime Agent & Index]]
-- [[_COMMUNITY_App.state Dependency Accessors|App.state Dependency Accessors]]
-- [[_COMMUNITY_WS Event Builders & Tests|WS Event Builders & Tests]]
-- [[_COMMUNITY_Search (Stub + Cosine)|Search (Stub + Cosine)]]
-- [[_COMMUNITY_API Wire Schemas|API Wire Schemas]]
-- [[_COMMUNITY_Agent Registry|Agent Registry]]
-- [[_COMMUNITY_Grant-Access Service|Grant-Access Service]]
-- [[_COMMUNITY_Run Registry|Run Registry]]
-- [[_COMMUNITY_Orchestrator|Orchestrator]]
-- [[_COMMUNITY_Claude Client|Claude Client]]
-- [[_COMMUNITY_Provenance Assembly|Provenance Assembly]]
-- [[_COMMUNITY_Redaction Claude Call|Redaction Claude Call]]
-- [[_COMMUNITY_Grant-Access Errors|Grant-Access Errors]]
-- [[_COMMUNITY_Claude Prompt Templates|Claude Prompt Templates]]
-- [[_COMMUNITY_Registry Builder|Registry Builder]]
-- [[_COMMUNITY_Query ID Minting|Query ID Minting]]
-- [[_COMMUNITY_Synthesis Claude Call|Synthesis Claude Call]]
-- [[_COMMUNITY_WebSocket Endpoint|WebSocket Endpoint]]
-- [[_COMMUNITY_POST query Handler|POST /query Handler]]
-- [[_COMMUNITY_Responder Boundary Pipeline|Responder Boundary Pipeline]]
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
 - [[_COMMUNITY_Community 30|Community 30]]
 - [[_COMMUNITY_Community 31|Community 31]]
 - [[_COMMUNITY_Community 32|Community 32]]
 - [[_COMMUNITY_Community 33|Community 33]]
 - [[_COMMUNITY_Community 34|Community 34]]
 - [[_COMMUNITY_Community 35|Community 35]]
-- [[_COMMUNITY_Community 36|Community 36]]
 - [[_COMMUNITY_Community 37|Community 37]]
 - [[_COMMUNITY_Community 38|Community 38]]
 - [[_COMMUNITY_Community 39|Community 39]]
@@ -61,31 +66,40 @@
 - [[_COMMUNITY_Community 49|Community 49]]
 - [[_COMMUNITY_Community 50|Community 50]]
 - [[_COMMUNITY_Community 51|Community 51]]
-- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
+- [[_COMMUNITY_Community 57|Community 57]]
+- [[_COMMUNITY_Community 58|Community 58]]
+- [[_COMMUNITY_Community 59|Community 59]]
+- [[_COMMUNITY_Community 60|Community 60]]
+- [[_COMMUNITY_Community 61|Community 61]]
+- [[_COMMUNITY_Community 62|Community 62]]
+- [[_COMMUNITY_Community 63|Community 63]]
+- [[_COMMUNITY_Community 64|Community 64]]
+- [[_COMMUNITY_Community 65|Community 65]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Relay Build Spec v2` - 15 edges
-2. `AgentRegistry` - 14 edges
-3. `Orchestrator` - 11 edges
-4. `lifespan()` - 10 edges
-5. `GrantAccessService` - 10 edges
-6. `EventBus` - 10 edges
-7. `redact` - 10 edges
-8. `Frozen Contract 1: Data Model` - 10 edges
-9. `RunRegistry` - 9 edges
-10. `WSManager` - 9 edges
+1. `AgentRegistry` - 21 edges
+2. `redact()` - 16 edges
+3. `verify_answer()` - 15 edges
+4. `RuntimeAgent` - 15 edges
+5. `Relay Build Spec v2` - 15 edges
+6. `Chunk` - 13 edges
+7. `AgentIndex` - 13 edges
+8. `patch_claude()` - 13 edges
+9. `Orchestrator` - 12 edges
+10. `lifespan()` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Response Item Shape` --conceptually_related_to--> `ResponseItem`  [INFERRED]
-  shared/contracts/data-model.md → app/models.py
-- `Redaction Claude Call (restricted gist)` --conceptually_related_to--> `redact()`  [INFERRED]
-  docs/relay-spec.md → app/claude/redaction.py
-- `search(query, agent_id, top_k) Signature` --conceptually_related_to--> `search()`  [INFERRED]
-  shared/contracts/search-interface.md → app/retrieval/search.py
-- `Visibility / Decision Enums + Gate Mapping` --conceptually_related_to--> `decide()`  [INFERRED]
-  shared/contracts/data-model.md → app/gate/policy.py
 - `Chunk Record Shape` --conceptually_related_to--> `Chunk`  [INFERRED]
-  shared/contracts/data-model.md → app/models.py
+  shared/contracts/data-model.md → backend/app/models.py
+- `Agent Record Shape` --conceptually_related_to--> `Agent`  [INFERRED]
+  shared/contracts/data-model.md → backend/app/models.py
+- `Cross-Agent Request Shape` --conceptually_related_to--> `CrossAgentRequest`  [INFERRED]
+  shared/contracts/data-model.md → backend/app/models.py
+- `Response Item Shape` --conceptually_related_to--> `ResponseItem`  [INFERRED]
+  shared/contracts/data-model.md → backend/app/models.py
+- `Redaction Claude Call (restricted gist)` --conceptually_related_to--> `redact()`  [INFERRED]
+  docs/relay-spec.md → backend/app/claude/redaction.py
 
 ## Hyperedges (group relationships)
 - **In-Responder Search->Gate->Redact Boundary Pipeline** — agent_respond, redaction_redact, permission_gate_wedge, retrieve_first_gate_second [INFERRED 0.85]
@@ -101,147 +115,171 @@
 - **Query Loop: Router-Gate-Verify-Synthesize** — relay_router, relay_permission_gate, relay_verification_claude_call, relay_orchestrator_loop [EXTRACTED 1.00]
 - **Three-Tier Visibility-to-Decision Mapping** — relay_three_tier_permission_model, datamodel_visibility_decision_enums, relay_redaction_claude_call [INFERRED 0.85]
 
-## Communities (53 total, 23 thin omitted)
+## Communities (66 total, 25 thin omitted)
 
-### Community 0 - "Capability Gate & App Wiring"
+### Community 0 - "Community 0"
+Cohesion: 0.05
+Nodes (50): GateDecision, The gate's per-chunk verdict. Values match data-model §4 `decision` verbatim., Visibility / Decision Enums + Gate Mapping, Enum, Exception, Flag, allows(), Capability (+42 more)
+
+### Community 1 - "Community 1"
+Cohesion: 0.05
+Nodes (56): H8 drop-in search swap, respond() gate seam, Retrieve-first, gate-second, agent-activated WS event, done WS event, WSManager (emit-by-query_id), cached_system_block, complete_text (+48 more)
+
+### Community 2 - "Community 2"
+Cohesion: 0.07
+Nodes (35): _passes_leak_guard(), Redaction Claude call: restricted text -> safe one-line gist (redaction.md §2.2), Return a safe one-line gist for a RESTRICTED chunk. Never returns chunk text., Return a safe one-line gist for a RESTRICTED chunk. Never returns chunk text., Deterministic content-free gist from owner-published doc_title only., Cheap deterministic backstop: reject if the gist shares a >=6-word verbatim, Deterministic, content-free gist (carries none of the restricted text). The, Reject if the gist is suspiciously long (>240 chars) or shares a >=6-word     ve (+27 more)
+
+### Community 3 - "Community 3"
+Cohesion: 0.06
+Nodes (37): agent-activated WS Event, done WS Event, response-item WS Event, POST /grant_access Endpoint, POST /query Endpoint, Frozen Contract 3: HTTP + WebSocket API, Frozen Contract 1: Data Model, Frozen Contract 2: search() Interface (+29 more)
+
+### Community 4 - "Community 4"
 Cohesion: 0.07
 Nodes (43): Query loop (spec section 10), response-item WS event, EventBus, allows, Capability, CapabilityGrant, issue_grant, get_settings (+35 more)
 
-### Community 1 - "WebSocket Manager & Config"
-Cohesion: 0.05
-Nodes (27): WSManager: bridge EventBus -> live sockets (api-websocket.md §2.6).  Responsibil, query_id -> set[WebSocket]; bridges EventBus frames to live sockets., Bind a socket to a query_id and start forwarding bus frames to it., Drop a socket from every query_id on disconnect., Send one event dict to all subscribers of query_id. Best-effort: a failed, WSManager, Config, get_settings() (+19 more)
-
-### Community 2 - "Permission Gate Package"
+### Community 5 - "Community 5"
 Cohesion: 0.06
-Nodes (28): GatedResult, Serialize to the EXACT frozen response-item payload (api-websocket.md)., Boundary-safe output of the gate for ONE chunk (permission-gate.md §2.1).      I, Visibility / Decision Enums + Gate Mapping, Exception, Flag, allows(), Capability (+20 more)
+Nodes (38): Agent Isolation Invariant (owner == agent_id), RuntimeAgent.respond, RuntimeAgent, RuntimeAgent.search, assert_isolation, load_corpus_chunks, WSManager.emit, WSManager.subscribe (+30 more)
 
-### Community 3 - "Boundary Pipeline & Claude Helpers"
+### Community 6 - "Community 6"
 Cohesion: 0.08
-Nodes (34): H8 drop-in search swap, respond() gate seam, Retrieve-first, gate-second, cached_system_block, complete_text, get_client (AsyncAnthropic singleton), parse (structured output), Fail-Closed Principle (+26 more)
+Nodes (26): _cosine_search(), _dense_order(), _get_bm25(), _hybrid_search(), _keyword_stub(), _lexical_order(), Frozen search() interface + keyword stub + real cosine (agents-corpus-index.md §, Lazily build + cache a BM25Okapi index over the agent's OWN chunks only.      To (+18 more)
 
-### Community 4 - "API Endpoints & Frozen Contracts"
+### Community 7 - "Community 7"
+Cohesion: 0.08
+Nodes (21): assert_isolation(), load_corpus_chunks(), Corpus load helpers + isolation assert (agents-corpus-index.md §2.3).  Responsib, Read app/data/corpora/<agent_id>.json into a list of Chunk dicts.      Asserts t, Raise if any chunk's `owner != agent_id` (spec §6 isolation guarantee)., Raise if any chunk's `owner != agent_id` (spec §6 isolation guarantee)., embed_query(), embed_texts() (+13 more)
+
+### Community 8 - "Community 8"
 Cohesion: 0.09
-Nodes (29): done WS Event, POST /grant_access Endpoint, POST /query Endpoint, Verification Claude call: grounding check (provenance-verification.md §2.3).  Re, Ask Claude whether `answer` is supported by `source_text`.      Uses structured, verify_answer(), Frozen Contract 3: HTTP + WebSocket API, Frozen Contract 1: Data Model (+21 more)
+Nodes (13): WSManager: bridge EventBus -> live sockets (api-websocket.md §2.6).  Responsibil, query_id -> set[WebSocket]; bridges EventBus frames to live sockets., Bind a socket to a query_id and start forwarding bus frames to it., Drop a socket from every query_id on disconnect., Send one event dict to all subscribers of query_id. Best-effort: a failed, WSManager, EventBus, EventBus: in-process async pub/sub keyed by query_id (router.md §2.4).  Responsi (+5 more)
 
-### Community 5 - "Shared Data Models"
-Cohesion: 0.08
-Nodes (26): Agent, Chunk, CrossAgentRequest, GateDecision, GrantAccessRequest, GrantAccessResponse, ProvenancePointer, Shared record shapes — the single source of truth for the whole backend.  Respon (+18 more)
-
-### Community 6 - "Agent Isolation & Runtime"
-Cohesion: 0.11
-Nodes (21): Agent Isolation Invariant (owner == agent_id), RuntimeAgent.respond, RuntimeAgent, RuntimeAgent.search, assert_isolation, load_corpus_chunks, embed_query, embed_texts (+13 more)
-
-### Community 7 - "Corpus Loading & Embeddings"
-Cohesion: 0.1
-Nodes (16): assert_isolation(), load_corpus_chunks(), Corpus load helpers + isolation assert (agents-corpus-index.md §2.3).  Responsib, Read app/data/corpora/<agent_id>.json into a list of Chunk dicts.      Asserts t, Raise if any chunk's `owner != agent_id` (spec §6 isolation guarantee)., embed_query(), embed_texts(), Embedding function + model id + dimension (agents-corpus-index.md §2.2).  Respon (+8 more)
-
-### Community 8 - "Grant-Access & Wire Schemas"
-Cohesion: 0.1
-Nodes (20): WSManager.emit, WSManager.subscribe, Grant-Access-Live Hero Beat, submit_query (POST /query), ChunkNotFoundError, AgentIndex.set_visibility, Deterministic Leak-Guard, _passes_leak_guard (+12 more)
-
-### Community 9 - "Router Fan-Out & Events"
+### Community 9 - "Community 9"
 Cohesion: 0.12
-Nodes (19): agent-activated WS event, done WS event, WSManager (emit-by-query_id), agent_activated_event builder, POST /grant_access (toggle + replay), GrantAccessService (toggle + replay-trigger), Replay trigger (re-run on same query_id), AgentIndex.set_visibility (mutation) (+11 more)
+Nodes (23): Agent, CrossAgentRequest, GatedResult, GrantAccessRequest, GrantAccessResponse, ProvenancePointer, Shared record shapes — the single source of truth for the whole backend.  Respon, The pointer half of the provenance/content split (spec §3).      Travels even wh (+15 more)
 
-### Community 10 - "Runtime Agent & Index"
-Cohesion: 0.11
-Nodes (12): RuntimeAgent: identity + own AgentIndex + the gate seam (agents-corpus-index.md, One party agent: identity + its own isolated index only., Retrieve over OWN index only. Delegates to search.search(query, self.id,, Seam for the GATE subsystem. retrieve-first, gate-second, IN this agent, RuntimeAgent, AgentIndex, load_agent_index(), AgentIndex: one agent's isolated flat index (agents-corpus-index.md §2.3, grant- (+4 more)
-
-### Community 11 - "App.state Dependency Accessors"
+### Community 10 - "Community 10"
 Cohesion: 0.12
+Nodes (9): ArrowIcon(), CheckIcon(), ChevronIcon(), DocIcon(), HandoffIcon(), LockIcon(), ResetIcon(), ShieldIcon() (+1 more)
+
+### Community 11 - "Community 11"
+Cohesion: 0.14
+Nodes (14): build_response_item(), Finalize a GatedResult into the wire ResponseItem (provenance-verification.md §2, Turn one gated chunk into the canonical Response item.      `decision` is the ga, Turn one gated chunk into the canonical Response item.      full -> verify the a, assemble_provenance(), Provenance pointer assembly — no Claude (provenance-verification.md §2.2).  Buil, Build the provenance pointer from a gated chunk (data-model §2 dict).      Resol, Build the provenance pointer from a gated chunk (data-model §2 dict).      Reads (+6 more)
+
+### Community 12 - "Community 12"
+Cohesion: 0.16
+Nodes (17): cached_system_block(), call_tool(), complete_text(), _first_block(), get_client(), _load_env_file(), parse(), Shared AsyncAnthropic client + model ids + helpers (redaction.md §2.1, provenanc (+9 more)
+
+### Community 13 - "Community 13"
+Cohesion: 0.14
+Nodes (15): AgentIndex, _build_matrix(), ChunkNotFoundError, load_agent_index(), AgentIndex: one agent's isolated flat index (agents-corpus-index.md §2.3, grant-, Raised by set_visibility when chunk_id is unknown (-> 404 upstream)., Raised by set_visibility when chunk_id is unknown (-> 404 upstream)., One agent's isolated flat index. Holds ONLY this agent's chunks.      `matrix` i (+7 more)
+
+### Community 14 - "Community 14"
+Cohesion: 0.2
+Nodes (17): _content_to_text(), _derive_title(), ingest_party(), is_noise(), iter_cc_sessions(), main(), _norm(), QAUnit (+9 more)
+
+### Community 15 - "Community 15"
+Cohesion: 0.17
 Nodes (15): get_grant_access_service(), get_orchestrator(), get_orchestrator_ws(), get_registry(), get_run_registry(), get_ws_manager(), get_ws_manager_ws(), Request-time app.state accessors (api-websocket.md §2.9).  Responsibility: thin (+7 more)
 
-### Community 12 - "WS Event Builders & Tests"
-Cohesion: 0.14
-Nodes (11): agent-activated WS Event, response-item WS Event, Response Item Shape, agent_activated_event(), Pure WS event builders (router.md §2.3, api-websocket.md).  Responsibility: pure, Build the frozen `agent-activated` frame:     {type, query_id, agent_id, party_n, Build the frozen `response-item` frame: {type:"response-item", query_id, ...item, response_item_event() (+3 more)
+### Community 16 - "Community 16"
+Cohesion: 0.15
+Nodes (11): AgentRegistry, build_registry(), AgentRegistry: the single agent_id -> Agent resolution point (agents-corpus-inde, Holds the 3 RuntimeAgents; the only place agent_id -> Agent resolution lives., Holds the 3 RuntimeAgents; the only place agent_id -> Agent resolution lives., Resolve an agent by id. Raises KeyError on unknown id (search() contract)., Resolve an agent by id. Raises KeyError on unknown id (search() contract)., Resolve party_name (for agent-activated / ResponseItem.source_party). (+3 more)
 
-### Community 13 - "Search (Stub + Cosine)"
-Cohesion: 0.17
-Nodes (11): _cosine_search(), _keyword_stub(), Frozen search() interface + keyword stub + real cosine (agents-corpus-index.md §, Inject the AgentRegistry at startup so search() resolves the per-agent index., FROZEN signature (search-interface.md). Single dispatch point.      Returns ALL, Deterministic keyword-overlap stub (search-interface.md stub algorithm):     tok, Real retrieval: embed query -> cosine vs agent.index.matrix (own index only), search() (+3 more)
-
-### Community 14 - "API Wire Schemas"
-Cohesion: 0.27
+### Community 17 - "Community 17"
+Cohesion: 0.35
 Nodes (12): AgentActivatedEvent, DoneEvent, GrantAccessRequest, GrantAccessResponse, ProvenanceEntry, QueryRequest, QueryResponse, Pydantic WIRE models — verbatim from the frozen contract (api-websocket.md §2.5, (+4 more)
 
-### Community 15 - "Agent Registry"
+### Community 18 - "Community 18"
 Cohesion: 0.18
-Nodes (6): AgentRegistry, Holds the 3 RuntimeAgents; the only place agent_id -> Agent resolution lives., Resolve an agent by id. Raises KeyError on unknown id (search() contract)., Every registered agent id, in stable order., Resolve party_name (for agent-activated / ResponseItem.source_party)., Resolve (owning agent, chunk) by globally-unique chunk_id (grant_access).
-
-### Community 16 - "Grant-Access Service"
-Cohesion: 0.2
 Nodes (6): GrantAccessService, Owns the two new behaviors: mutate one chunk's visibility, and trigger a     rep, Flip one chunk's stored visibility (restricted -> public for the demo)., Validate the query_id, toggle the chunk, and build the ACK. The replay is, Re-invoke the orchestrator for the stored query on the SAME query_id,         st, Tests for app/grant_access/ (BUILD_INDEX.md §2 / step 30).  TODO: assert toggle_
 
-### Community 17 - "Run Registry"
-Cohesion: 0.18
+### Community 19 - "Community 19"
+Cohesion: 0.2
 Nodes (7): Per-query_id run context for grant-access replay (grant-access.md §2.3, OQ-8)., The original request behind one query_id (grant-access.md §2.3)., In-memory map query_id -> RunContext. Single source of truth for     'what was t, Store run context at query mint time (/query happy path)., Look up the original request for a query_id; None if unknown., RunContext, RunRegistry
 
-### Community 18 - "Orchestrator"
-Cohesion: 0.18
-Nodes (6): Orchestrator, Orchestrator.run: plan -> fan out -> collect -> verify -> synthesize (orchestrat, Drives one query run end-to-end. Transport-agnostic via an injected sink., Plan -> fan out -> collect -> verify -> synthesize.          Resolve asker, allo, Schedule run() as a fire-and-forget asyncio task and return immediately, Tests for app/orchestrator/orchestrator.py (BUILD_INDEX.md §2 / step 20).  TODO:
+### Community 20 - "Community 20"
+Cohesion: 0.21
+Nodes (10): Frozen, byte-stable system/user prompt templates (cache-friendly).  One place fo, Build the per-call redaction user message. SKELETON — no logic., Build the per-call redaction user message., Build the per-call verification user message (delimited tags). SKELETON., Build the per-call synthesis user message. Must contain NO restricted     payloa, Build the per-call verification user message (delimited tags)., Build the per-call synthesis user message (Phase 3)., redaction_user() (+2 more)
 
-### Community 19 - "Claude Client"
-Cohesion: 0.2
-Nodes (9): cached_system_block(), complete_text(), get_client(), parse(), Shared AsyncAnthropic client + model ids + helpers (redaction.md §2.1, provenanc, Process-wide AsyncAnthropic singleton. Reads ANTHROPIC_API_KEY from env., Return a system block with an ephemeral cache breakpoint, so a byte-stable     s, One-shot text completion. Returns the first text block, or None on refusal. (+1 more)
+### Community 21 - "Community 21"
+Cohesion: 0.17
+Nodes (3): Serialize to the EXACT frozen response-item payload (api-websocket.md)., Cardinal no-leak test: restricted/private content never crosses the boundary., Tests for app/models.py (BUILD_INDEX.md §2 / step 2).  Phase 1 scope: the frozen
 
-### Community 20 - "Provenance Assembly"
-Cohesion: 0.2
-Nodes (7): build_response_item(), build_response_item: gate verdict + chunk -> ResponseItem (provenance-verificati, Turn one gated chunk into the canonical Response item.      `decision` is the ga, assemble_provenance(), Provenance pointer assembly — no Claude (provenance-verification.md §2.2).  Resp, Build the provenance pointer from a gated chunk (data-model §2 dict).      Resol, Tests for app/provenance/ (BUILD_INDEX.md §2 / step 16).  TODO: assert assemble_
-
-### Community 21 - "Redaction Claude Call"
+### Community 22 - "Community 22"
 Cohesion: 0.22
-Nodes (8): _passes_leak_guard(), Redaction Claude call: restricted text -> safe one-line gist (redaction.md §2.2), Return a safe one-line gist for a RESTRICTED chunk. Never returns chunk text., Deterministic content-free gist from owner-published doc_title only., Cheap deterministic backstop: reject if the gist shares a >=6-word verbatim, redact(), _safe_fallback(), Tests for app/claude/redaction.py (BUILD_INDEX.md §2 / step 13).  TODO: against
+Nodes (7): RuntimeAgent: identity + own AgentIndex + the gate seam (agents-corpus-index.md, One party agent: identity + its own isolated index only., One party agent: identity + its own isolated index only., Retrieve over OWN index only. Delegates to search.search(query, self.id,, Retrieve over OWN index only. Delegates to search.search(query, self.id,, Seam for the GATE subsystem. retrieve-first, gate-second, IN this agent, RuntimeAgent
 
-### Community 22 - "Grant-Access Errors"
-Cohesion: 0.22
-Nodes (8): ChunkNotFoundError, Raised by set_visibility when chunk_id is unknown (-> 404 upstream)., GrantResult, GrantAccessService: toggle + replay (grant-access.md §2.1).  Responsibility: the, Internal result of grant_and_rerun, shaped into GrantAccessResponse by the route, Raised when query_id has no stored RunContext (-> 404)., UnknownQueryError, KeyError
+### Community 23 - "Community 23"
+Cohesion: 0.2
+Nodes (3): _agent(), hybrid_registry(), Hybrid retrieval (BM25 + static dense, RRF) — Phase 1.5.  Self-contained: builds
 
-### Community 23 - "Claude Prompt Templates"
-Cohesion: 0.25
-Nodes (7): Frozen, byte-stable system/user prompt templates (cache-friendly).  Responsibili, Build the per-call redaction user message. SKELETON — no logic., Build the per-call verification user message (delimited tags). SKELETON., Build the per-call synthesis user message. Must contain NO restricted     payloa, redaction_user(), synthesis_user(), verification_user()
+### Community 24 - "Community 24"
+Cohesion: 0.31
+Nodes (7): Config, get_settings(), Application settings (api-websocket.md §2.2).  Responsibility: pydantic-settings, Process-wide settings. Env-prefixed `RELAY_`, loaded from `.env` in dev., Return the cached process-wide Settings instance., Settings, BaseSettings
 
-### Community 24 - "Registry Builder"
-Cohesion: 0.5
-Nodes (3): build_registry(), AgentRegistry: the single agent_id -> Agent resolution point (agents-corpus-inde, Build 3 isolated RuntimeAgents from AGENT_DEFS + seed files. Called once at
+### Community 25 - "Community 25"
+Cohesion: 0.28
+Nodes (8): _agent(), fixture_registry(), make_chunk(), make_fake_client(), Deterministic hand-built registry: mixed tiers + known overlaps., Registry built from the ingested real corpora (keyword-stub mode)., Stand-in for AsyncAnthropic whose .messages.create returns a canned message (a, real_registry()
 
-### Community 25 - "Query ID Minting"
+### Community 26 - "Community 26"
+Cohesion: 0.32
+Nodes (6): GrantResult, GrantAccessService: toggle + replay (grant-access.md §2.1).  Responsibility: the, Internal result of grant_and_rerun, shaped into GrantAccessResponse by the route, Raised when query_id has no stored RunContext (-> 404)., UnknownQueryError, KeyError
+
+### Community 27 - "Community 27"
+Cohesion: 0.29
+Nodes (4): Orchestrator, Orchestrator.run: plan -> fan out -> collect -> verify -> synthesize (orchestrat, Drives one query run end-to-end. Transport-agnostic via an injected sink., Schedule run() as a fire-and-forget asyncio task and return immediately
+
+### Community 28 - "Community 28"
+Cohesion: 0.29
+Nodes (4): Router.dispatch: fan-out + event timing (router.md §2.3).  Responsibility: resol, In-process fan-out engine + event clock., Fan a cross-agent request out to every discovered party.          Phase 1: emit, Router
+
+### Community 29 - "Community 29"
+Cohesion: 0.38
+Nodes (5): create_app(), lifespan(), FastAPI entrypoint: create_app() + lifespan (api-websocket.md §2.1, BUILD_INDEX., Startup wiring (BUILD_INDEX.md §6), in order:      1. load settings;     2. buil, Construct the FastAPI app: lifespan, CORS, and mounted routers.      SKELETON —
+
+### Community 30 - "Community 30"
+Cohesion: 0.33
+Nodes (4): Chunk, One row in an agent's flat index (data-model.md §2).      `embedding` is server-, _FakeBlock, _FakeMessage
+
+### Community 31 - "Community 31"
+Cohesion: 0.6
+Nodes (5): list_chunks(), _load(), main(), Flip one chunk's visibility tier in a seed corpus, safely.  Avoids hand-editing, set_tier()
+
+### Community 32 - "Community 32"
 Cohesion: 0.5
 Nodes (3): new_query_id(), query_id minting (api-websocket.md §2.4, BUILD_INDEX.md §2 core/ids.py).  Respon, Return a fresh opaque query id, e.g. "q_" + short hex.
 
-### Community 26 - "Synthesis Claude Call"
+### Community 33 - "Community 33"
 Cohesion: 0.5
 Nodes (3): Synthesis Claude call: final cited answer (orchestrator.md §3.1, BUILD_INDEX §2., Compose the final cited answer from verified full items (SYNTH_MODEL,     max_to, synthesize()
 
-### Community 27 - "WebSocket Endpoint"
+### Community 34 - "Community 34"
 Cohesion: 0.5
 Nodes (3): /ws/query WebSocket endpoint (api-websocket.md §2.8).  Responsibility: support B, Accept the socket, then loop on frames: `type:query` mints a run + acks +     st, ws_query()
 
-### Community 28 - "POST /query Handler"
+### Community 35 - "Community 35"
 Cohesion: 0.5
 Nodes (3): POST /query handler (api-websocket.md §2.7).  Responsibility: resolve the asker, Mint a query_id, record run state, kick the fan-out, return immediately.     SKE, submit_query()
 
-### Community 29 - "Responder Boundary Pipeline"
-Cohesion: 0.5
-Nodes (3): respond_for_agent: the boundary pipeline inside the responding agent (router.md,, Run the boundary pipeline for one agent and return already-gated items.      sea, respond_for_agent()
-
 ## Knowledge Gaps
-- **207 isolated node(s):** `Request-time app.state accessors (api-websocket.md §2.9).  Responsibility: thin`, `Return the AgentRegistry from request.app.state.`, `Return the Orchestrator from request.app.state.`, `Return the WSManager from request.app.state.`, `Return the RunRegistry from request.app.state.` (+202 more)
+- **216 isolated node(s):** `Return the AgentRegistry from request.app.state.`, `Return the Orchestrator from request.app.state.`, `Return the WSManager from request.app.state.`, `Return the RunRegistry from request.app.state.`, `Return the GrantAccessService from request.app.state (DI for the route).` (+211 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Relay Build Spec v2` connect `API Endpoints & Frozen Contracts` to `Corpus Loading & Embeddings`?**
-  _High betweenness centrality (0.078) - this node is a cross-community bridge._
-- **Why does `Frozen Contract 1: Data Model` connect `API Endpoints & Frozen Contracts` to `Permission Gate Package`, `WS Event Builders & Tests`, `Shared Data Models`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Why does `Chunk` connect `Shared Data Models` to `Runtime Agent & Index`, `Grant-Access Errors`, `Agent Registry`?**
-  _High betweenness centrality (0.060) - this node is a cross-community bridge._
-- **Are the 7 inferred relationships involving `AgentRegistry` (e.g. with `GrantResult` and `UnknownQueryError`) actually correct?**
-  _`AgentRegistry` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 6 inferred relationships involving `Orchestrator` (e.g. with `GrantResult` and `UnknownQueryError`) actually correct?**
-  _`Orchestrator` has 6 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 8 inferred relationships involving `lifespan()` (e.g. with `get_settings()` and `build_registry()`) actually correct?**
-  _`lifespan()` has 8 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 4 inferred relationships involving `GrantAccessService` (e.g. with `AgentRegistry` and `Orchestrator`) actually correct?**
-  _`GrantAccessService` has 4 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `Chunk` connect `Community 30` to `Community 0`, `Community 3`, `Community 9`, `Community 13`, `Community 16`, `Community 22`?**
+  _High betweenness centrality (0.099) - this node is a cross-community bridge._
+- **Why does `AgentRegistry` connect `Community 16` to `Community 41`, `Community 42`, `Community 18`, `Community 22`, `Community 23`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 30`?**
+  _High betweenness centrality (0.079) - this node is a cross-community bridge._
+- **Why does `Relay Build Spec v2` connect `Community 3` to `Community 7`?**
+  _High betweenness centrality (0.054) - this node is a cross-community bridge._
+- **Are the 11 inferred relationships involving `AgentRegistry` (e.g. with `hybrid_registry()` and `fixture_registry()`) actually correct?**
+  _`AgentRegistry` has 11 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 9 inferred relationships involving `redact()` (e.g. with `complete_text()` and `redaction_user()`) actually correct?**
+  _`redact()` has 9 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 10 inferred relationships involving `verify_answer()` (e.g. with `call_tool()` and `verification_user()`) actually correct?**
+  _`verify_answer()` has 10 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 9 inferred relationships involving `RuntimeAgent` (e.g. with `build_registry()` and `_agent()`) actually correct?**
+  _`RuntimeAgent` has 9 INFERRED edges - model-reasoned connections that need verification._

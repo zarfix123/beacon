@@ -1,23 +1,26 @@
-// Top-right: the "Agents reached" list. One expandable row per party.
-//   Atlas → full (verified)   Lyra → redacted → full (grant-access)   Vega → denied
-// Appears in the results phase.
+// Top-right: the "Agents reached" list. One expandable row per response card (live
+// r.cards, multiple per party). full = green verified · redacted = amber + lock + Request
+// access · denied = grey. Appears in the results phase.
 
-import { SignalIcon, CheckIcon, LockIcon, ChevronIcon, DocIcon } from './icons.jsx'
+import { SignalIcon, CheckIcon, LockIcon, ChevronIcon } from './icons.jsx'
 import s from './AgentsReached.module.css'
 
-function Avatar({ children, muted }) {
-  return <span className={`${s.avatar}${muted ? ` ${s.avatarMuted}` : ''}`}>{children}</span>
+function Avatar({ children, muted, focused }) {
+  return (
+    <span className={`${s.avatar}${muted ? ` ${s.avatarMuted}` : ''}${focused ? ` ${s.avatarFocused}` : ''}`}>
+      {children}
+    </span>
+  )
 }
 
-function RowHead({ color, letter, name, repo, mutedAvatar, children, onToggle }) {
+function RowHead({ letter, name, repo, mutedAvatar, focused, children, onToggle }) {
   return (
     <div className={s.rowHead} onClick={onToggle}>
-      <span className={s.dot} style={{ background: color }} />
-      <Avatar muted={mutedAvatar}>{letter}</Avatar>
+      <Avatar muted={mutedAvatar} focused={focused}>{letter}</Avatar>
       <div className={s.rowMain}>
         <div className={s.rowTitle}>
           <span className={s.name}>{name}</span>
-          <span className={s.repo}>{repo}</span>
+          {repo && <span className={s.repo}>{repo}</span>}
         </div>
       </div>
       {children}
@@ -25,34 +28,56 @@ function RowHead({ color, letter, name, repo, mutedAvatar, children, onToggle })
   )
 }
 
-function DocChip({ children, withBorder = true }) {
-  return (
-    <span className={`${s.doc}${withBorder ? '' : ` ${s.docNoBorder}`}`}>
-      <DocIcon />
-      <span className={s.docLabel}>{children}</span>
-    </span>
-  )
-}
-
 const OVERLINE = {
-  full: { cls: 'overlineFull', dot: 'var(--active-500)' },
-  redacted: { cls: 'overlineRedacted', dot: 'var(--signal-500)' },
-  denied: { cls: 'overlineDenied', dot: 'var(--warm-mid)' },
+  full: { cls: 'overlineFull', dot: 'var(--active-500)', label: 'Full reply' },
+  redacted: { cls: 'overlineRedacted', dot: 'var(--warn-500)', label: 'Redacted' },
+  denied: { cls: 'overlineDenied', dot: 'var(--warm-mid)', label: 'Denied' },
 }
 
-function Overline({ variant, children }) {
-  const o = OVERLINE[variant]
+function Overline({ variant }) {
+  const o = OVERLINE[variant] || OVERLINE.denied
   return (
     <span className={`${s.overline} ${s[o.cls]}`}>
-      <span className={s.oDot} style={{ background: o.dot }} />{children}
+      <span className={s.oDot} style={{ background: o.dot }} />{o.label}
     </span>
   )
 }
 
-export default function AgentsReached({
-  colAtlas, colLyra, colVega, granted, requesting, requestLabel, showLatency, reachLine,
-  expanded, onToggleAtlas, onToggleLyra, onToggleVega, onRequest,
-}) {
+function CardBody({ decision, answer, verified }) {
+  if (decision === 'full') {
+    return (
+      <div className={s.expand}>
+        <Overline variant="full" />
+        <p className={s.reply}>{answer}</p>
+        {verified && (
+          <div className={s.metaRow}>
+            <span className={s.verified}><CheckIcon size={12} stroke="currentColor" />Verified against source</span>
+          </div>
+        )}
+      </div>
+    )
+  }
+  if (decision === 'redacted') {
+    return (
+      <div className={s.expand}>
+        <Overline variant="redacted" />
+        <p className={s.replyMuted}>{answer}</p>
+        <div className={s.restrictedRow}>
+          <LockIcon size={12} stroke="currentColor" width={2.2} />
+          <span className={s.mono}>restricted · request access to view</span>
+        </div>
+      </div>
+    )
+  }
+  return (
+    <div className={s.expand}>
+      <Overline variant="denied" />
+      <p className={s.replySecondary}>{answer || 'A relevant item exists here but was not shared.'}</p>
+    </div>
+  )
+}
+
+export default function AgentsReached({ cards, reachLine, expanded, requestingChunkId, focus, onToggle, onRequest }) {
   return (
     <div className={s.wrap}>
       <div className={s.card}>
@@ -61,74 +86,42 @@ export default function AgentsReached({
           <span className={s.reach}>{reachLine}</span>
         </div>
 
-        {/* ATLAS — full */}
-        <div className={s.row} style={{ borderLeftColor: colAtlas }}>
-          <RowHead color={colAtlas} letter="A" name="Atlas" repo="billing-svc" onToggle={onToggleAtlas}>
-            <ChevronIcon open={expanded.atlas} />
-          </RowHead>
-          {expanded.atlas && (
-            <div className={s.expand}>
-              <Overline variant="full">Full reply</Overline>
-              <p className={s.reply}>Lowered the gateway limit to <b className={s.semibold}>60 req/min</b> while the retry queue refactors — intentional, reverts at 16:00.</p>
-              <div className={s.metaRow}>
-                <span className={s.verified}><CheckIcon size={12} stroke="currentColor" />Verified</span>
-                {showLatency && <span className={s.latency}>142ms</span>}
-                <DocChip>RetryPolicy.md</DocChip>
+        {cards.length === 0 && (
+          <p className={s.empty}>No party returned a shareable answer to this question.</p>
+        )}
+
+        {cards.map((c) => {
+          const open = !!expanded[c.chunkId]
+          const requesting = requestingChunkId === c.chunkId
+          return (
+            <div key={c.chunkId} className={s.row} style={{ borderLeftColor: c.color }}>
+              <RowHead
+                letter={c.letter} name={c.party} repo={c.docTitle}
+                mutedAvatar={c.decision === 'denied'} focused={focus === c.agentId}
+                onToggle={() => onToggle(c.chunkId)}
+              >
+                {c.decision === 'redacted' && (
+                  <button
+                    className={s.request}
+                    onClick={(e) => { e.stopPropagation(); onRequest(c.chunkId) }}
+                    disabled={requesting}
+                  >
+                    {requesting
+                      ? <span className={s.spinner} />
+                      : <LockIcon size={11} stroke="currentColor" width={2.2} />}
+                    {requesting ? 'Requesting…' : 'Request access'}
+                  </button>
+                )}
+                <ChevronIcon open={open} />
+              </RowHead>
+              <div className={`${s.drawer}${open ? ` ${s.drawerOpen}` : ''}`}>
+                <div className={s.drawerInner}>
+                  <CardBody decision={c.decision} answer={c.answer} verified={c.verified} />
+                </div>
               </div>
             </div>
-          )}
-        </div>
-
-        {/* LYRA — redacted → full */}
-        <div className={s.row} style={{ borderLeftColor: colLyra }}>
-          <RowHead color={colLyra} letter="L" name="Lyra" repo="auth-core" onToggle={onToggleLyra}>
-            {!granted && (
-              <button className={s.request} onClick={onRequest} disabled={requesting}>
-                {requesting
-                  ? <span className={s.spinner} />
-                  : <LockIcon size={11} stroke="currentColor" width={2.2} />}
-                {requestLabel}
-              </button>
-            )}
-            <ChevronIcon open={expanded.lyra} />
-          </RowHead>
-          {expanded.lyra && (
-            <div className={s.expand}>
-              {granted ? (
-                <div>
-                  <Overline variant="full">Full reply</Overline>
-                  <p className={s.reply}>Token issuance is capped at <b className={s.semibold}>30 req/min</b> per service. Raise it in the auth-core throttle config for headroom.</p>
-                  <div className={s.metaRow}>
-                    <span className={s.verified}><CheckIcon size={12} stroke="currentColor" />Granted by Diego</span>
-                    <DocChip withBorder={false}>throttle.yaml</DocChip>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <Overline variant="redacted">Redacted</Overline>
-                  <p className={s.replyMuted}>auth-core throttles this same path, but the exact threshold is scoped to the security team.</p>
-                  <div className={s.restrictedRow}>
-                    <LockIcon size={12} stroke="currentColor" width={2.2} />
-                    <span className={s.mono}>throttle.yaml · restricted</span>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* VEGA — denied */}
-        <div className={s.row} style={{ borderLeftColor: colVega }}>
-          <RowHead color={colVega} letter="V" name="Vega" repo="data-pipeline" mutedAvatar onToggle={onToggleVega}>
-            <ChevronIcon open={expanded.vega} />
-          </RowHead>
-          {expanded.vega && (
-            <div className={s.expand}>
-              <Overline variant="denied">Denied</Overline>
-              <p className={s.replySecondary}>A restricted runbook on this path exists, owned by the <b className={s.strong}>Data team</b>. Vega can't share it.</p>
-            </div>
-          )}
-        </div>
+          )
+        })}
       </div>
     </div>
   )

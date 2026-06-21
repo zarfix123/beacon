@@ -4,19 +4,21 @@
   right: 24px;
   width: 360px;
   max-width: calc(100% - 48px);
-  z-index: 6;
+  z-index: var(--z-panel);
 }
 
 .card {
   background: rgba(255, 255, 255, .95);
   backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px;
   padding: 14px;
   box-shadow: 0 10px 34px rgba(15, 14, 13, .12);
   display: flex;
   flex-direction: column;
   gap: 9px;
+  border-radius: var(--radius-lg);
+  /* entrance: rises in just after the answer panel (staggered choreography) */
+  animation: bc-rise var(--dur-slow) var(--ease-out) 60ms both;
 }
 
 .header { display: flex; align-items: center; justify-content: space-between; padding: 0 2px; }
@@ -26,30 +28,55 @@
 }
 .reach { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); }
 
+.empty { margin: 4px 2px; font-size: 12.5px; line-height: 1.5; color: var(--text-muted); }
+
 /* agent row — left rail color set inline via borderLeftColor */
 .row {
   background: var(--surface-card);
   border: 1px solid var(--border-subtle);
   border-left-width: 3px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 11px 13px;
-  transition: border-color 120ms;
+  transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
-.row:hover { border-color: var(--border-strong); }
+.row:hover { border-color: var(--border-strong); background: var(--surface-sunken); }
 
 .rowHead { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-.dot { width: 8px; height: 8px; border-radius: 999px; flex: none; }
 .avatar {
   width: 27px; height: 27px; border-radius: 999px;
   background: var(--surface-sunken); border: 1px solid var(--border-subtle);
   display: inline-flex; align-items: center; justify-content: center;
   font-weight: 600; font-size: 12px; color: var(--text-secondary); flex: none;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), border-color 160ms var(--ease-out);
 }
+.avatar:hover { transform: scale(1.1); border-color: var(--border-strong); }
 .avatarMuted { color: var(--text-muted); }
+/* clicked-to-zoom node gets a signal-blue ring */
+.avatarFocused, .avatarFocused:hover {
+  border-color: var(--signal-500);
+  box-shadow: 0 0 0 2px var(--signal-500), 0 0 12px var(--signal-200);
+}
 .rowMain { flex: 1; min-width: 0; }
 .rowTitle { display: flex; align-items: center; gap: 6px; }
 .name { font-weight: 600; font-size: 13.5px; }
 .repo { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); }
+
+/* accordion drawer — grid-rows 0fr→1fr animates to auto height with no JS measuring.
+   Content stays mounted so it animates closed too; inner clips + fades. */
+.drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms var(--ease-out);
+}
+.drawerOpen { grid-template-rows: 1fr; }
+.drawerInner {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 240ms var(--ease-out);
+}
+.drawerOpen .drawerInner { opacity: 1; }
 
 .expand { margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--border-subtle); }
 
@@ -57,47 +84,38 @@
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 10.5px; letter-spacing: .5px; text-transform: uppercase; font-weight: 600; margin-bottom: 8px;
 }
-.overlineFull { color: #2c5d40; }
-.overlineRedacted { color: var(--signal-700); }
+.overlineFull { color: var(--active-700); }
+.overlineRedacted { color: var(--warn-700); }
 .overlineDenied { color: var(--deep-gray); }
 .oDot { width: 5px; height: 5px; border-radius: 999px; }
 
 .reply { margin: 0; font-size: 13px; line-height: 1.5; color: var(--text-primary); }
 .replyMuted { margin: 0; font-size: 13px; line-height: 1.5; color: var(--text-muted); }
 .replySecondary { margin: 0; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
-.semibold { font-weight: 600; }
-.strong { font-weight: 600; color: var(--text-primary); }
 
 .metaRow { display: flex; align-items: center; gap: 9px; margin-top: 10px; }
 .verified { display: inline-flex; align-items: center; gap: 5px; color: var(--active-500); font-size: 11.5px; font-weight: 500; }
-.latency { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); }
-.restrictedRow { display: flex; align-items: center; gap: 7px; margin-top: 9px; color: var(--signal-700); font-size: 11.5px; }
+.restrictedRow { display: flex; align-items: center; gap: 7px; margin-top: 9px; color: var(--warn-700); font-size: 11.5px; }
 .mono { font-family: var(--font-mono); }
-
-/* doc chip */
-.doc {
-  display: inline-flex; align-items: center; gap: 6px; margin-left: auto;
-  padding: 4px 8px; border: 1px solid var(--border-subtle); border-radius: 6px;
-  background: var(--surface-card); cursor: pointer; transition: all 120ms;
-}
-.doc:hover { color: var(--signal-700); border-color: var(--signal-200); background: var(--signal-50); }
-.docNoBorder { border: none; background: transparent; }
-.docLabel { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary); }
 
 /* request-access button */
 .request {
   display: inline-flex; align-items: center; gap: 6px; height: 27px; padding: 0 10px;
-  border: 1px solid var(--signal-200); border-radius: 7px;
-  background: var(--signal-50); color: var(--signal-700);
+  border: 1px solid var(--warn-200); border-radius: var(--radius-md);
+  background: var(--warn-50); color: var(--warn-700);
   font-family: var(--font-sans); font-weight: 500; font-size: 11.5px;
-  cursor: pointer; flex: none; transition: background 120ms, transform 120ms;
+  cursor: pointer; flex: none; transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
 .request:disabled { cursor: default; }
-.request:not(:disabled):hover { background: #f6ead2; }
+.request:not(:disabled):hover { background: #f6ead2; transform: translateY(-1px); }
 .request:not(:disabled):active { transform: scale(.97); }
 
 .spinner {
   width: 10px; height: 10px; border: 2px solid rgba(155, 110, 40, .35);
-  border-top-color: var(--signal-600); border-radius: 999px; display: inline-block;
+  border-top-color: var(--warn-600); border-radius: 999px; display: inline-block;
   animation: bc-spin .7s linear infinite;
 }
+
+/* keyframes co-located so CSS Modules scopes name + reference together */
+@keyframes bc-spin { to { transform: rotate(360deg) } }
+@keyframes bc-rise { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }

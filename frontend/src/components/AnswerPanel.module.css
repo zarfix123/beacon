@@ -4,20 +4,21 @@
   left: 24px;
   width: 360px;
   max-width: calc(100% - 48px);
-  z-index: 6;
+  z-index: var(--z-panel);
 }
 
 .card {
   background: rgba(255, 255, 255, .95);
   backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   padding: 18px;
   box-shadow: 0 10px 34px rgba(15, 14, 13, .12);
+  /* entrance: first element to rise in (leads the staggered reveal) */
+  animation: bc-rise var(--dur-slow) var(--ease-out) both;
 }
 
 .eyebrowRow { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.live { width: 6px; height: 6px; border-radius: 999px; background: var(--active-500); }
 .eyebrow { font-size: 11.5px; letter-spacing: .6px; text-transform: uppercase; color: var(--text-muted); }
 
 .prose {
@@ -29,8 +30,6 @@
   color: var(--text-primary);
   text-wrap: pretty;
 }
-.semibold { font-weight: 600; }
-.muted { color: var(--text-muted); }
 
 /* inline numbered citation chips */
 .cite, .citeLock {
@@ -39,22 +38,50 @@
   min-width: 15px;
   height: 15px;
   padding: 0 3px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 9.5px;
   vertical-align: 3px;
   margin: 0 1px;
 }
 .cite { justify-content: center; background: var(--ink); color: var(--ivory); }
-.citeLock { gap: 2px; background: var(--signal-50); color: var(--signal-700); }
+.citeLock { gap: 2px; background: var(--warn-50); color: var(--warn-700); }
 
-.sources {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+/* eyebrow-row actions: sources pill + expand control, pushed right */
+.eyebrowActions { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+
+.expandBtn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 22px; padding: 0;
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+  background: var(--surface-card); color: var(--text-secondary); cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.expandBtn:hover { border-color: var(--border-default); color: var(--text-primary); background: var(--surface-sunken); }
+
+/* inline answer: cap height + scroll (follows the stream); Expand opens the full reader */
+.proseScroll { max-height: 38vh; overflow-y: auto; }
+
+/* citations: a compact count pill that opens a popover holding the source list */
+.citeAnchor { position: relative; }
+
+.sourcesPill {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 22px; padding: 0 9px;
+  border: 1px solid var(--border-subtle); border-radius: 999px;
+  background: var(--surface-card); color: var(--text-secondary);
+  font-family: var(--font-mono); font-size: 11px; cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.sourcesPill:hover { border-color: var(--border-default); color: var(--text-primary); background: var(--surface-sunken); }
+
+.popover {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: var(--z-panel);
+  width: 248px; display: flex; flex-direction: column; gap: 7px;
   padding: 11px 12px;
-  background: var(--surface-sunken);
-  border-radius: 8px;
+  background: var(--surface-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md); box-shadow: 0 10px 28px rgba(15, 14, 13, .14);
+  animation: bc-rise var(--dur-fast) var(--ease-out) both;
 }
 .sourceRow { display: flex; align-items: center; gap: 8px; }
 
@@ -64,13 +91,13 @@
   justify-content: center;
   width: 16px;
   height: 16px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 10px;
   flex: none;
 }
 .num { background: var(--ink); color: var(--ivory); }
-.numLock { background: var(--signal-50); color: var(--signal-700); }
+.numLock { background: var(--warn-50); color: var(--warn-700); }
 
 .party { font-size: 12.5px; color: var(--text-secondary); font-weight: 500; }
 .partyMuted { font-size: 12.5px; color: var(--text-muted); }
@@ -82,7 +109,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.pathRestricted { font-family: var(--font-mono); font-size: 11px; color: var(--signal-700); }
+.pathRestricted { font-family: var(--font-mono); font-size: 11px; color: var(--warn-700); }
 .right { margin-left: auto; flex: none; display: inline-flex; }
 .noShrink { flex: none; display: inline-flex; }
 
@@ -96,16 +123,16 @@
   width: 100%;
   height: 40px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--ink);
   color: var(--ivory);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: 13.5px;
   cursor: pointer;
-  transition: background 120ms, transform 120ms;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
-.handoff:hover { background: var(--near-black); }
+.handoff:hover { background: var(--near-black); transform: translateY(-1px); }
 .handoff:active { transform: scale(.98); }
 
 .confirm {
@@ -116,7 +143,55 @@
   padding: 9px 11px;
   border: 1px solid rgba(63, 125, 87, .28);
   background: var(--active-50);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
+  /* success arrives rather than snaps — state-change feedback */
+  animation: bc-rise var(--dur-base) var(--ease-out) both;
 }
-.confirmText { font-size: 12.5px; color: #2c5d40; }
+.confirmText { font-size: 12.5px; color: var(--active-700); }
 .hint { margin: 9px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--text-muted); }
+
+@keyframes bc-rise { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }
+
+/* ===== expand-to-large reader: a right-half slide-over for long streamed answers ===== */
+.reader {
+  position: fixed; top: 0; right: 0; height: 100dvh;
+  width: min(50vw, 640px); min-width: 360px; max-width: calc(100vw - 32px);
+  background: var(--surface-card);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: -18px 0 52px rgba(15, 14, 13, .16);
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 420ms var(--ease-out);
+  will-change: transform;
+  z-index: 90;
+}
+.readerOpen { transform: translateX(0); }
+
+.readerHead {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex: none;
+}
+.readerClose {
+  display: inline-flex; padding: 6px; border: none; background: none; cursor: pointer;
+  color: var(--text-muted); border-radius: var(--radius-sm);
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.readerClose:hover { color: var(--text-primary); background: var(--surface-sunken); }
+
+.readerBody { flex: 1; min-height: 0; overflow-y: auto; padding: 26px 30px 44px; }
+.readerProse {
+  font-family: var(--font-serif); font-size: 18px; line-height: 1.62;
+  letter-spacing: -.1px; color: var(--text-primary); margin: 0; text-wrap: pretty;
+}
+.readerSources {
+  margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--border-subtle);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.readerSourcesLabel {
+  font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px;
+}
+
+/* the slide is a transition (not animation), so it needs a LOCAL reduced-motion guard */
+@media (prefers-reduced-motion: reduce) {
+  .reader { transition: none; }
+}

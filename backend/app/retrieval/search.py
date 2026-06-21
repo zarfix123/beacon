@@ -156,16 +156,6 @@ def _dense_sims(query: str, agent: "RuntimeAgent"):
     return (matrix @ qv) / denom
 
 
-def _dense_order(query: str, agent: "RuntimeAgent") -> Optional[list[int]]:
-    """Chunk indices ranked by cosine (best first), or None if the matrix wasn't built."""
-    sims = _dense_sims(query, agent)
-    if sims is None:
-        return None
-    import numpy as np
-
-    return list(np.argsort(-sims))
-
-
 def _hybrid_search(query: str, agent: "RuntimeAgent", top_k: int) -> list[Chunk]:
     """BM25 + dense, fused with Reciprocal Rank Fusion. Returns all tiers, ungated,
     descending fused score (max-normalized to (0,1]), <= top_k. Falls back to whichever
