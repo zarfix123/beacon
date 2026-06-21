@@ -1,4 +1,4 @@
-# Relay — Complete Build Spec v2 (Berkeley AI Hackathon 2026)
+# Beacon — Complete Build Spec v2 (Berkeley AI Hackathon 2026)
 
 *Working name. Alternatives: Conduit, Quorum, Synapse.*
 
@@ -166,4 +166,4 @@
 
 ---
 
-**Pitch positioning (one line):** Delphi clones one expert, Glean searches one org, universal-memory tools pool your own context. Relay is the first to broker knowledge *between* parties, with enforced permission tiers and verifiable provenance.
+**Pitch positioning (one line):** Delphi clones one expert, Glean searches one org, universal-memory tools pool your own context. Beacon is the first to broker knowledge *between* parties, with enforced permission tiers and verifiable provenance.

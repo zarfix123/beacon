@@ -1,4 +1,4 @@
-# Relay — Frozen Contract 2: `search()` Interface
+# Beacon — Frozen Contract 2: `search()` Interface
 
 > **Status: FROZEN (hour 0).** Changing this signature or the returned shape requires a 2-minute sync between Hao (implements) and Dennis (consumes / stubs). Derived from spec sections 9 and 15.
 

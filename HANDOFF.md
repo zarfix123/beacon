@@ -1,8 +1,8 @@
 # Handoff → Frontend integration
 
-Read this first if you're wiring the Relay UI to the real backend. TL;DR: **the backend and
+Read this first if you're wiring the Beacon UI to the real backend. TL;DR: **the backend and
 the live data layer are done. The job is to render the EXISTING components from one hook
-(`useRelayQuery`) instead of the `setTimeout`/`mockData.js` mocks.** Don't rebuild visuals,
+(`useBeaconQuery`) instead of the `setTimeout`/`mockData.js` mocks.** Don't rebuild visuals,
 don't touch the backend.
 
 ## What's already built (so you don't redo it)
@@ -11,7 +11,7 @@ don't touch the backend.
   redaction + verification (Claude), synthesis, grant-access replay, live WebSocket events.
   Endpoints: `POST /query`, `WS /ws/query`, `POST /grant_access`, `GET /agents`, `GET /health`,
   `POST /demo/reset`.
-- **Live data layer** (`frontend/src/useRelayQuery.js`): owns the WebSocket, parses the real
+- **Live data layer** (`frontend/src/useBeaconQuery.js`): owns the WebSocket, parses the real
   event stream into the shape the components need. **This hook is the contract — consume it.**
 - **Working reference** (`frontend/src/components/LiveQueryDebug.jsx`): a barebones client at
   `http://localhost:5173/?debug` that already drives the full flow (query → cards → grant flip)
@@ -19,7 +19,7 @@ don't touch the backend.
 
 ## The 3 files to read (in order)
 
-1. `frontend/src/useRelayQuery.js` — the hook + its exact output shape (docstring at top).
+1. `frontend/src/useBeaconQuery.js` — the hook + its exact output shape (docstring at top).
 2. `frontend/src/components/LiveQueryDebug.jsx` — how to consume it, end to end.
 3. `shared/contracts/api-websocket.md` — the frozen wire shapes (source of truth). Also
    `DEMO.md` (repo root) for the demo scenarios and run instructions.
@@ -27,7 +27,7 @@ don't touch the backend.
 ## The hook's output (what you render from)
 
 ```js
-const r = useRelayQuery()
+const r = useBeaconQuery()
 // r.phase        'idle' | 'searching' | 'synthesizing' | 'done'   ('synthesizing' = answer streaming)
 // r.connected    bool
 // r.agents       [{ agent_id, party_name, status }]      // the nodes that lit up
@@ -45,7 +45,7 @@ const r = useRelayQuery()
 
 | component | today (mock) | swap to |
 |---|---|---|
-| `AskTheNetwork.jsx` | `setTimeout` phase machine | `useRelayQuery()`; map `r.phase` → empty/searching/results; `submit`/`reset`/`requestAccess` |
+| `AskTheNetwork.jsx` | `setTimeout` phase machine | `useBeaconQuery()`; map `r.phase` → empty/searching/results; `submit`/`reset`/`requestAccess` |
 | `AgentsReached.jsx` | 3 hardcoded rows | render dynamic cards from `r.cards` (key by `chunk_id`); keep the decision→visual logic (full=green✓ / redacted=amber+lock+Request / denied=grey) |
 | `AnswerPanel.jsx` | hardcoded prose | `r.answer` + `r.provenance` (the `[n]` citations already line up 1:1 with `provenance` order — backend guarantees it) |
 | `NetworkConstellation.jsx` | Atlas/Lyra/Vega | map `r.agents` (+ `GET /agents`) → nodes; show real `party_name`; asker = "You" center |
@@ -86,6 +86,6 @@ The three demo scenarios the UI must handle (see `DEMO.md` for exact prompts): m
 
 ## After you pull
 
-`git pull` gets `useRelayQuery.js`, `LiveQueryDebug.jsx`, this file, and `DEMO.md`. The
+`git pull` gets `useBeaconQuery.js`, `LiveQueryDebug.jsx`, this file, and `DEMO.md`. The
 existing components are untouched — they're yours to swap. Coordinate to run the combined
 stack when you want to see it live.

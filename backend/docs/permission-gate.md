@@ -1,4 +1,4 @@
-# Relay — BUILD doc: Permission Gate (3-tier full / redacted / denied)
+# Beacon — BUILD doc: Permission Gate (3-tier full / redacted / denied)
 
 > **Subsystem owner:** Dennis (backend / the wedge).
 > **Status:** plan + index. This is a build map, not an implementation. Code below is *sketch/pseudocode* — signatures and shapes are load-bearing; bodies are illustrative.

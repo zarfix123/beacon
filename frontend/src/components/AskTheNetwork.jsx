@@ -1,9 +1,9 @@
 // "Ask the Network" — the main Beacon screen. Drives the constellation, answer panel,
-// agents panel, and prompt from the live backend via useRelayQuery (one consumer; the
+// agents panel, and prompt from the live backend via useBeaconQuery (one consumer; the
 // visual children stay presentational). phase idle|searching|done → empty|searching|results.
 
 import { useEffect, useRef, useState } from 'react'
-import { useRelayQuery } from '../useRelayQuery.js'
+import { useBeaconQuery } from '../useBeaconQuery.js'
 import NetworkConstellation from './NetworkConstellation.jsx'
 import AnswerPanel from './AnswerPanel.jsx'
 import AgentsReached from './AgentsReached.jsx'
@@ -26,7 +26,7 @@ function partyDecision(cards) {
 
 export default function AskTheNetwork() {
   const { liveAccent: accent, scope: scopeLabel } = CONFIG
-  const r = useRelayQuery()
+  const r = useBeaconQuery()
 
   const [question, setQuestion] = useState(DEFAULT_QUESTION)
   const [expanded, setExpanded] = useState({})            // by chunk_id

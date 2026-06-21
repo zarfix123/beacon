@@ -1,6 +1,6 @@
-# Relay — Backend
+# Beacon — Backend
 
-The backend for **Relay**, a permissioned knowledge-brokering network built for the
+The backend for **Beacon**, a permissioned knowledge-brokering network built for the
 Berkeley AI Hackathon 2026. Three independent party agents query each other's
 isolated corpora and share only what the owner authorizes — the wedge is
 **enforced permission at the owner's boundary** (full / redacted / denied, decided
@@ -32,9 +32,9 @@ Flat in-memory index, 3 in-process agents, seeded corpora (10–30 chunks each),
 locked demo query, no production auth, no database, no GraphRAG. Scoping is real
 and enforced in-demo, not hardened for prod.
 
-## Search backends (`RELAY_SEARCH`)
+## Search backends (`BEACON_SEARCH`)
 
-The frozen `search(query, agent_id, top_k)` dispatches on the `RELAY_SEARCH` env var:
+The frozen `search(query, agent_id, top_k)` dispatches on the `BEACON_SEARCH` env var:
 
 | Mode | Engine | Needs |
 |------|--------|-------|
@@ -56,7 +56,7 @@ The frozen `search(query, agent_id, top_k)` dispatches on the `RELAY_SEARCH` env
 Quick check (no server, no gate):
 
 ```bash
-RELAY_SEARCH=hybrid python -c "from app.agents.registry import build_registry; \
+BEACON_SEARCH=hybrid python -c "from app.agents.registry import build_registry; \
 from app.retrieval import search as S; r=build_registry(with_embeddings=True); \
 S.set_registry(r); print([(c['chunk_id'], round(c['score'],3)) for c in \
 S.search('how do we stop the service getting overloaded','agent_helios',3)])"
@@ -79,6 +79,6 @@ uvicorn app.main:app --reload --port 8000
 Base URL `http://localhost:8000`; WebSocket `ws://localhost:8000/ws/query`.
 Embeddings use **model2vec static** (`minishlab/potion-retrieval-32M`) — local,
 numpy-only, no torch, NOT Claude (Anthropic has no embeddings endpoint). See
-**Search backends** above for the `RELAY_SEARCH` modes. The three Claude calls
+**Search backends** above for the `BEACON_SEARCH` modes. The three Claude calls
 (redaction, verification, synthesis) need `ANTHROPIC_API_KEY`.
 ```

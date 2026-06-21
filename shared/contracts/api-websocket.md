@@ -1,4 +1,4 @@
-# Relay — Frozen Contract 3: HTTP + WebSocket API
+# Beacon — Frozen Contract 3: HTTP + WebSocket API
 
 > **Status: FROZEN (hour 0).** Changing any endpoint, payload, or event requires a 2-minute sync between Dennis (serves) and Hao (renders). Derived from spec sections 6, 10, 12, and 15.
 

@@ -1,4 +1,4 @@
-# Relay Backend — BUILD doc: Router (discovery, cross-agent query, live events)
+# Beacon Backend — BUILD doc: Router (discovery, cross-agent query, live events)
 
 > **Status: PLAN / INDEX.** This is a build plan, not an implementation. Code blocks are
 > sketches/pseudocode showing signatures and control flow, not finished functions.

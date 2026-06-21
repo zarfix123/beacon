@@ -1,4 +1,4 @@
-# Relay — Full Checkpoint
+# Beacon — Full Checkpoint
 
 A single, detailed snapshot of the entire project: what it is, every phase, the architecture,
 the UI, the demo, the data, the tooling, and what's left. (See also `DEMO.md` for the run
@@ -7,9 +7,9 @@ original build plan.)
 
 ---
 
-## 1. What Relay is
+## 1. What Beacon is
 
-**Relay is a permissioned knowledge-brokering network.** An asking agent ("You") fans a
+**Beacon is a permissioned knowledge-brokering network.** An asking agent ("You") fans a
 question out to other party agents; each party's **gate** decides what may cross its boundary
 (`full` / `redacted` / `denied`); full answers are **verified** against their source; and the
 asker **synthesizes** one cited answer from what comes back. The product thesis — "the wedge" —
@@ -35,10 +35,10 @@ The three parties (real exported Claude data, fictional names):
 | phase | name | what it delivered |
 |---|---|---|
 | **1** | Retrieval foundation | ingestion → 3 isolated corpora; `AgentIndex`/`AgentRegistry`; the frozen `search()` seam (keyword stub) |
-| **1.5** | Hybrid retrieval (Hao) | BM25 + static `model2vec` embeddings fused with RRF, behind the same seam (`RELAY_SEARCH=hybrid`) |
+| **1.5** | Hybrid retrieval (Hao) | BM25 + static `model2vec` embeddings fused with RRF, behind the same seam (`BEACON_SEARCH=hybrid`) |
 | **2** | The wedge | the gate (policy + capability), redaction + verification (Claude), provenance, the per-party responder |
 | **3** | The spine | router fan-out + live WebSocket events + orchestrator + synthesis + grant-access replay |
-| **4** | Make the demo real | planted demo scenario + tiering, relevance floor, the live UI data layer (`useRelayQuery`) + walking skeleton, dev tooling |
+| **4** | Make the demo real | planted demo scenario + tiering, relevance floor, the live UI data layer (`useBeaconQuery`) + walking skeleton, dev tooling |
 | **post-4** | Polish + scale + integration | **streamed** synthesis; corpus scaled to ~4,335; **3-party** fan-out; **Hao wired the redesigned UI** to the live backend |
 
 ---
@@ -53,7 +53,7 @@ The three parties (real exported Claude data, fictional names):
 - **`app/retrieval/search.py`** — the **frozen** `search(query, agent_id, top_k) → list[Chunk]`.
   Returns **all tiers, ungated** (gating is downstream). Three backends behind one dispatch:
   `stub` (keyword overlap), `cosine` (dense), `hybrid` (BM25 + dense + RRF). Plus the
-  **relevance floor** (`RELAY_MIN_SIM`) that drops off-topic results → enables no-hit / single-hit.
+  **relevance floor** (`BEACON_MIN_SIM`) that drops off-topic results → enables no-hit / single-hit.
 - **`app/agents/embeddings.py`** — `model2vec` static embeddings (`minishlab/potion-retrieval-32M`,
   512-dim), numpy-only, **no GPU/torch**. `embeddings.npz` is the offline cache.
 
@@ -110,7 +110,7 @@ Click "Request access" on a redacted card → POST /grant_access → targeted re
 - **Accuracy** (self-retrieval): hybrid **recall@5 ≈ 97%**, recall@1 ≈ 85%, MRR ≈ 0.90.
 - **Embedding** all chunks: one-time **~4s** offline (cached to `embeddings.npz`); startup loads the
   cache. → *"4,300+ documents searched in ~15ms, no GPU."*
-- **Relevance floor** (`RELAY_MIN_SIM=0.35`): on-topic hits sit at 0.43+, off-domain at 0.20–0.25,
+- **Relevance floor** (`BEACON_MIN_SIM=0.35`): on-topic hits sit at 0.43+, off-domain at 0.20–0.25,
   so the floor cleanly separates multi-hit / single-hit / no-hit.
 - **`top_k=2`** (measured the right call): on the demo query it's identical to higher k (floor drops
   the rest); on broad queries higher k is ~2× slower per added card and adds clutter.
@@ -123,7 +123,7 @@ Click "Request access" on a redacted card → POST /grant_access → targeted re
   center, pulses while searching), `AgentsReached` (the agent cards — full=green✓ /
   redacted=amber+lock+"request access" / denied=grey), `AnswerPanel` (synthesized answer +
   provenance citations + "hand off to Claude Code"), `PromptPill` (the query input).
-- **The live data layer** — `frontend/src/useRelayQuery.js` (Dennis): one hook owns the WebSocket
+- **The live data layer** — `frontend/src/useBeaconQuery.js` (Dennis): one hook owns the WebSocket
   and reduces the real event stream into `{phase, agents, cards, answer, provenance, submit,
   requestAccess, reset}`. `phase` includes `'synthesizing'` so the UI shows a live state while the
   answer streams. **`AskTheNetwork.jsx` is the single consumer** — Hao swapped his mock source for
@@ -172,14 +172,14 @@ grant-access is a **targeted** replay so only the one card re-streams.
 ## 8. Tooling & ops
 
 - **`scripts/run.sh`** — one command: backend `:8000` + frontend `:5173`, sets the demo env
-  (`RELAY_SEARCH=hybrid`, `RELAY_TOP_K=2`, `RELAY_MIN_SIM=0.35`), waits on `/health`.
+  (`BEACON_SEARCH=hybrid`, `BEACON_TOP_K=2`, `BEACON_MIN_SIM=0.35`), waits on `/health`.
 - **`scripts/ingest.py`** — real raw data → corpora (`--loose`/`--max-per-title` for a fuller corpus;
   noise + secret filters always on).
 - **`scripts/demo_seed.py`** — plants the demo scenario + tiers + embeds (idempotent; disk truth).
 - **`scripts/build_embeddings.py`** — (re)build `embeddings.npz`.
 - **`scripts/tier.py`** — flip one chunk's visibility.
 - **`POST /demo/reset`** — re-arm the demo tiers in the live index between rehearsal takes (no restart).
-- **Data sharing**: corpora/embeddings/raw are **gitignored** (real private data). `relay-hao-bundle.zip`
+- **Data sharing**: corpora/embeddings/raw are **gitignored** (real private data). `beacon-hao-bundle.zip`
   (corpora + embeddings + setup) is how a teammate gets a working backend without the raw data.
 
 ---
@@ -203,7 +203,7 @@ end-to-end demo runs on real data with the hero beat, on Hao's redesigned UI.
 **Optional / deferred:**
 - **MCP scale substrate** (the "parties connect live knowledge at scale" pitch) — Phase 5, only once
   the demo is rehearsed with time to spare. `search()` is the drop-in seam for it.
-- **Fabricated-source ✗ kicker** — behind `RELAY_VERIFY_SYNTHESIS` (default off); grant-access is the
+- **Fabricated-source ✗ kicker** — behind `BEACON_VERIFY_SYNTHESIS` (default off); grant-access is the
   rock-solid hero, flip the kicker on only if rehearsal proves it reliable.
 - **Polish**: floor tuning for crisper scenarios, faster models if latency bites, demo rehearsal.
 

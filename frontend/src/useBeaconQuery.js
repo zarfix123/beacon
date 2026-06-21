@@ -1,5 +1,5 @@
 /**
- * useRelayQuery — the live data layer for Relay (Phase 4).
+ * useBeaconQuery — the live data layer for Beacon (Phase 4).
  *
  * Owns one WebSocket to the backend, reduces the real event stream
  * (ack -> agent-activated -> response-item -> done) into the shape the UI renders, and
@@ -87,7 +87,7 @@ function reducer(state, action) {
   }
 }
 
-export function useRelayQuery() {
+export function useBeaconQuery() {
   const [state, dispatch] = useReducer(reducer, INITIAL)
   const wsRef = useRef(null)
   const pendingRef = useRef(null) // question queued until the socket opens

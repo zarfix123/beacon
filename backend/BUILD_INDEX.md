@@ -1,6 +1,6 @@
-# Relay — Master Backend Build Index
+# Beacon — Master Backend Build Index
 
-> **This is the single entry-point document for building the entire Relay backend.**
+> **This is the single entry-point document for building the entire Beacon backend.**
 > Read this first. It reconciles the seven subsystem build docs into one canonical
 > file layout, one ordered build plan mapped to the hackathon checkpoints, one
 > dependency list, and one startup-wiring plan. Where the subsystem docs disagreed
@@ -11,7 +11,7 @@
 
 ## 1. Overview — what the backend is, and the wedge
 
-Relay is a **permissioned knowledge-brokering network**: three independent party
+Beacon is a **permissioned knowledge-brokering network**: three independent party
 agents (`agent_northwind`, `agent_helios`, `agent_quanta`), each with its own
 isolated seeded corpus and flat vector index, that query each other for
 already-solved engineering problems and share only what the owner authorizes.
@@ -54,7 +54,7 @@ backend/
 ├── BUILD_INDEX.md                  # this file — the entry point
 ├── README.md                       # short orientation -> points here + contracts
 ├── requirements.txt                # consolidated pins (see §5)
-├── .env.example                    # ANTHROPIC_API_KEY=, RELAY_SEARCH=stub, ...
+├── .env.example                    # ANTHROPIC_API_KEY=, BEACON_SEARCH=stub, ...
 ├── pytest.ini                      # async test config (asyncio_mode = auto)
 │
 ├── app/
@@ -84,7 +84,7 @@ backend/
 │   ├── retrieval/
 │   │   ├── __init__.py
 │   │   └── search.py               # FROZEN search(query, agent_id, top_k) entry; _keyword_stub + _cosine_search;
-│   │                               #   dispatch via RELAY_SEARCH; gate-free, all tiers, KeyError on unknown id
+│   │                               #   dispatch via BEACON_SEARCH; gate-free, all tiers, KeyError on unknown id
 │   │
 │   ├── gate/
 │   │   ├── __init__.py             # public surface: evaluate, GatedResult, GateDecision, GateError, issue_grant
@@ -234,7 +234,7 @@ feeds it or transports it.** Stub seams keep every step unblocked.
 | 11 | H3-8 | **gate** | `app/gate/gate.py` `evaluate(chunk, *, query, grant, resolve_party_name)` end-to-end with a temporary no-op redact returning a static fallback gist; add `GatedResult` + `to_wire()` to `models.py`. **Leakage test:** no raw text/embedding in non-full GatedResult. | 10 |
 | 12 | H3-8 | **redaction** | `app/claude/client.py` shared AsyncAnthropic client + model constants + `complete_text`/`cached_system_block`; `app/claude/prompts.py` frozen redaction prompt. | 2 |
 | 13 | H3-8 | **redaction** | `app/claude/redaction.py` `redact(chunk)`: real Claude call (max_tokens~80, temp/sampling per Opus 4.8) + deterministic leak-guard + `_safe_fallback`; swap into `gate.py`. Test against the seeded restricted servo chunk: gist exists, one line, does NOT contain the solution token. | 12,11 |
-| 14 | **H8** | retrieval/integration | **H8 swap:** `app/agents/embeddings.py` (pin EMBED_MODEL/EMBED_DIM) + `scripts/build_embeddings.py` (write `data/embeddings.npz`) + `_cosine_search()` behind `RELAY_SEARCH=cosine`, OR delegate `search()` to Hao's real module. Re-run step-8 tests; sync EMBED_MODEL/EMBED_DIM with Hao. Drop-in, no call-site change. | 8,13 |
+| 14 | **H8** | retrieval/integration | **H8 swap:** `app/agents/embeddings.py` (pin EMBED_MODEL/EMBED_DIM) + `scripts/build_embeddings.py` (write `data/embeddings.npz`) + `_cosine_search()` behind `BEACON_SEARCH=cosine`, OR delegate `search()` to Hao's real module. Re-run step-8 tests; sync EMBED_MODEL/EMBED_DIM with Hao. Drop-in, no call-site change. | 8,13 |
 | 15 | H8-13 | **verification** | `app/claude/verification.py` `verify_answer(answer, source_text)->VerifyResult` (structured `parse`, max_tokens=128, frozen cached system block, fail-closed verified=False). Smoke-test one supported (True) + one contradicting (False) pair. | 12 |
 | 16 | H8-13 | **provenance** | `app/provenance/pointer.py` `assemble_provenance()` (never reads text/embedding) + `app/provenance/assembler.py` `build_response_item(chunk, decision)` — verify ONLY `full`; redacted/denied stay verified=False; delegate redacted gist to redaction. | 15,13 |
 | 17 | H8-13 | events/router | `app/events/bus.py` `EventBus` (subscribe/emit/unsubscribe via put_nowait); unit-test two queues on one query_id both receive. | 1 |
@@ -287,14 +287,14 @@ Entry: `uvicorn app.main:app --reload --port 8000`. `app = create_app()` in
 `app/main.py`. Startup wiring, in order, inside the `lifespan`:
 
 1. **Load settings** — `config.get_settings()` reads `ANTHROPIC_API_KEY`, CORS
-   origins (Vite 5173 / CRA 3000), seed paths, `top_k`, default asker, `RELAY_SEARCH`,
+   origins (Vite 5173 / CRA 3000), seed paths, `top_k`, default asker, `BEACON_SEARCH`,
    the three Claude model ids.
 2. **Build the registry** — `agents.registry.build_registry(with_embeddings=...)`
    loads `app/data/agents.json` + `corpora/*.json` into 3 isolated `AgentIndex`
    objects, asserts `owner == agent_id` and enum validity at load, attaches the
    embedding matrix from `data/embeddings.npz` when in cosine mode.
 3. **Wire search** — set the registry on `retrieval.search` so `search(query,
-   agent_id, top_k)` resolves the agent's index. `RELAY_SEARCH=stub|cosine`
+   agent_id, top_k)` resolves the agent's index. `BEACON_SEARCH=stub|cosine`
    selects the backend (drop-in identical shape).
 4. **Build the event plumbing** — one `EventBus` instance, and one `WSManager`
    that subscribes to the bus per `query_id` and forwards frames to live sockets.
