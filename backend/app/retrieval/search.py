@@ -25,6 +25,12 @@ _REGISTRY: Optional["AgentRegistry"] = None
 # (BM25 + dense fused with RRF — the Phase-1.5 engine). All share the frozen shape.
 SEARCH_BACKEND = os.getenv("RELAY_SEARCH", "stub")
 
+# Relevance floor: drop any result whose absolute dense cosine sim is below this, so a
+# genuinely off-topic query returns [] (no-hit) and a one-party query only surfaces the
+# relevant party (single-hit). 0.0 = off (default; preserves the frozen "return top_k"
+# behavior for the stub + existing tests). The demo sets RELAY_MIN_SIM in run.sh.
+RELEVANCE_FLOOR = float(os.getenv("RELAY_MIN_SIM", "0.0"))
+
 _TOKEN_RE = re.compile(r"\w+")
 
 # Per-agent BM25 index cache for the hybrid path: agent_id -> (chunks_ref, BM25Okapi).
@@ -86,22 +92,19 @@ def _keyword_stub(query: str, agent: "RuntimeAgent", top_k: int) -> list[Chunk]:
 
 def _cosine_search(query: str, agent: "RuntimeAgent", top_k: int) -> list[Chunk]:
     """Real retrieval: embed query -> cosine vs agent.index.matrix (own index only)
-    -> argsort desc -> attach score in [0,1] -> top_k. Same Chunk shape, all tiers."""
+    -> argsort desc -> attach score in [0,1] -> top_k. Same Chunk shape, all tiers.
+    Drops results below RELEVANCE_FLOOR (absolute cosine) when the floor is enabled."""
     import numpy as np
 
-    from app.agents.embeddings import embed_query
-
-    matrix = agent.index.matrix
-    if matrix is None or matrix.shape[0] == 0:
+    sims = _dense_sims(query, agent)
+    if sims is None:
         return []
-    qv = embed_query(query)
-    denom = (np.linalg.norm(matrix, axis=1) * np.linalg.norm(qv)) + 1e-9
-    sims = (matrix @ qv) / denom
     order = np.argsort(-sims)[:top_k]
+    floor = max(RELEVANCE_FLOOR, 0.0)
     return [
         {**agent.index.chunks[i], "score": float((sims[i] + 1.0) / 2.0)}
         for i in order
-        if sims[i] > 0
+        if sims[i] > 0 and sims[i] >= floor
     ]
 
 
@@ -137,9 +140,10 @@ def _lexical_order(query: str, agent: "RuntimeAgent") -> Optional[list[int]]:
     return list(np.argsort(-scores))
 
 
-def _dense_order(query: str, agent: "RuntimeAgent") -> Optional[list[int]]:
-    """Chunk indices ranked by cosine vs the agent's embedding matrix (best first),
-    or None if the matrix wasn't built (stub-mode registry)."""
+def _dense_sims(query: str, agent: "RuntimeAgent"):
+    """Absolute cosine sims (in [-1, 1]) of the query vs the agent's matrix, or None if
+    the matrix wasn't built (stub-mode registry). Shared by cosine search, dense-order,
+    and the relevance floor so the query is embedded only once."""
     matrix = agent.index.matrix
     if matrix is None or matrix.shape[0] == 0:
         return None
@@ -149,7 +153,16 @@ def _dense_order(query: str, agent: "RuntimeAgent") -> Optional[list[int]]:
 
     qv = embed_query(query)
     denom = (np.linalg.norm(matrix, axis=1) * np.linalg.norm(qv)) + 1e-9
-    sims = (matrix @ qv) / denom
+    return (matrix @ qv) / denom
+
+
+def _dense_order(query: str, agent: "RuntimeAgent") -> Optional[list[int]]:
+    """Chunk indices ranked by cosine (best first), or None if the matrix wasn't built."""
+    sims = _dense_sims(query, agent)
+    if sims is None:
+        return None
+    import numpy as np
+
     return list(np.argsort(-sims))
 
 
@@ -164,7 +177,11 @@ def _hybrid_search(query: str, agent: "RuntimeAgent", top_k: int) -> list[Chunk]
     if n == 0:
         return []
 
-    orders = [o for o in (_lexical_order(query, agent), _dense_order(query, agent)) if o is not None]
+    import numpy as np
+
+    sims = _dense_sims(query, agent)                                  # computed once
+    dense_order = list(np.argsort(-sims)) if sims is not None else None
+    orders = [o for o in (_lexical_order(query, agent), dense_order) if o is not None]
     if not orders:
         return []
 
@@ -176,4 +193,12 @@ def _hybrid_search(query: str, agent: "RuntimeAgent", top_k: int) -> list[Chunk]
     ranked = sorted(range(n), key=lambda i: fused[i], reverse=True)[:top_k]
     top = fused[ranked[0]] if ranked else 1.0
     top = top or 1.0
-    return [{**chunks[i], "score": round(fused[i] / top, 4)} for i in ranked if fused[i] > 0]
+    floor = max(RELEVANCE_FLOOR, 0.0)
+    out: list[Chunk] = []
+    for i in ranked:
+        if fused[i] <= 0:
+            continue
+        if floor > 0.0 and sims is not None and sims[i] < floor:      # relevance floor
+            continue
+        out.append({**chunks[i], "score": round(fused[i] / top, 4)})
+    return out

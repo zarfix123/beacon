@@ -27,6 +27,7 @@ from app.router.router import Router
 from app.router.responder import respond_for_agent, set_registry as set_responder_registry
 from app.api import http as http_routes
 from app.api import ws as ws_routes
+from app.api import meta as meta_routes
 from app.grant_access import routes as grant_access_routes
 
 
@@ -47,12 +48,20 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
 
     # ---- 2. registry (3 isolated agents) ----
-    registry = build_registry(with_embeddings=(settings.relay_search == "cosine"))
+    registry = build_registry(with_embeddings=settings.relay_search in ("cosine", "hybrid"))
 
     # ---- 3. wire search + responder (both need the registry: search for chunks,
     #         responder for party_name resolution on the gated items) ----
     search_module.set_registry(registry)
     set_responder_registry(registry)
+
+    # pre-warm: build each party's BM25 index + load the embedding model now, so the first
+    # LIVE query doesn't pay the ~250ms lazy cold-start. One-time cost at startup.
+    for _aid in registry.all_ids():
+        try:
+            search_module.search("warmup", _aid, 1)
+        except Exception:
+            pass
 
     # ---- 4. event plumbing ----
     bus = EventBus()
@@ -103,6 +112,7 @@ def create_app() -> FastAPI:
     app.include_router(http_routes.router)                          # POST /query
     app.include_router(ws_routes.router)                            # WS /ws/query
     app.include_router(grant_access_routes.router)                  # POST /grant_access
+    app.include_router(meta_routes.router)                          # GET /health,/agents; POST /demo/reset
     return app
 
 

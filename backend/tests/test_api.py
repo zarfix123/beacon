@@ -88,3 +88,13 @@ def test_grant_access_unknown_chunk_404(client):
     body = client.post("/query", json={"query": "servo jitter"}).json()
     resp = client.post("/grant_access", json={"chunk_id": "nope", "query_id": body["query_id"]})
     assert resp.status_code == 404
+
+
+def test_meta_endpoints(client):
+    assert client.get("/health").json() == {"status": "ok"}
+    agents = client.get("/agents").json()
+    # the live client builds the constellation + real party names from this
+    assert {a["id"] for a in agents} == {"fix_a", "fix_b"}
+    assert all(a["party_name"] for a in agents)
+    # /demo/reset is a no-op no-raise when the demo chunks aren't in this (fixture) registry
+    assert client.post("/demo/reset").json() == {"reset": {}}
