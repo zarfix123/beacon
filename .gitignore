@@ -26,5 +26,8 @@ backend/app/data/corpora/*.json
 # Playwright MCP browser artifacts (screenshots/snapshots from local verification)
 .playwright-mcp/
 
-# Graphify AST cache — regenerable from the graph, not source. Local-only.
-graphify-out/cache/
+# Graphify code-graph output — regenerable tool artifact, not source. Local-only.
+graphify-out/
+
+# Frontend production build output — regenerable with `npm run build`. Local-only.
+frontend/dist/
