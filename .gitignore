@@ -28,3 +28,12 @@ backend/app/data/corpora/*.json
 
 # Graphify AST cache — regenerable from the graph, not source. Local-only.
 graphify-out/cache/
+
+# design-sync: staged converter scripts, build output, and machine state.
+# Durable inputs ARE committed: .design-sync/{config.json,NOTES.md,conventions.md,
+# previews/,overrides/} and the bundle entry barrel frontend/.ds-bundle-entry.jsx.
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules

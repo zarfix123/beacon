@@ -1,0 +1,50 @@
+{
+  "projectId": "2afe0638-2775-4189-810e-b0116b83b1ae",
+  "shape": "package",
+  "pkg": "beacon-frontend",
+  "globalName": "Beacon",
+  "componentSrcMap": {
+    "PromptPill": "src/components/PromptPill.jsx",
+    "AnswerPanel": "src/components/AnswerPanel.jsx",
+    "AgentsReached": "src/components/AgentsReached.jsx",
+    "NetworkConstellation": "src/components/NetworkConstellation.jsx",
+    "SignalIcon": "src/components/icons.jsx",
+    "CheckIcon": "src/components/icons.jsx",
+    "LockIcon": "src/components/icons.jsx",
+    "ChevronIcon": "src/components/icons.jsx",
+    "ShieldIcon": "src/components/icons.jsx",
+    "ArrowIcon": "src/components/icons.jsx",
+    "ResetIcon": "src/components/icons.jsx",
+    "HandoffIcon": "src/components/icons.jsx",
+    "ExpandIcon": "src/components/icons.jsx",
+    "CloseIcon": "src/components/icons.jsx"
+  },
+  "dtsPropsFor": {
+    "PromptPill": "question: string; onQ: (e: any) => void; onKey: (e: any) => void; onSubmit: () => void; isSearching?: boolean; scopeLabel: string;",
+    "AnswerPanel": "answer: string; provenance?: Array<{ source_party: string; source_doc_title?: string; decision: 'full' | 'redacted' | 'denied'; verified?: boolean; chunk_id?: string }>; cards?: Array<{ chunkId: string; answer?: string }>; handedOff?: boolean; onHandoff?: () => void;",
+    "AgentsReached": "cards: Array<{ chunkId: string; letter: string; party: string; docTitle?: string; decision: 'full' | 'redacted' | 'denied'; answer?: string; verified?: boolean; color?: string; agentId?: string }>; reachLine?: string; expanded?: Record<string, boolean>; requestingChunkId?: string | null; focus?: string | null; onToggle: (chunkId: string) => void; onRequest: (chunkId: string) => void;",
+    "NetworkConstellation": "isSearching?: boolean; isResults?: boolean; accent?: string; nodes?: Array<{ agentId: string; letter: string; label: string; color: string; cards?: Array<{ chunkId: string; color: string }> }>; requestingAgentId?: string | null; subtitle?: string; focus?: string | null; onClearFocus?: () => void;",
+    "SignalIcon": "size?: number; stroke?: string;",
+    "CheckIcon": "size?: number; stroke?: string;",
+    "LockIcon": "size?: number; stroke?: string;",
+    "ChevronIcon": "open?: boolean;",
+    "ShieldIcon": "size?: number;",
+    "ArrowIcon": "size?: number;",
+    "ResetIcon": "size?: number;",
+    "HandoffIcon": "size?: number;",
+    "ExpandIcon": "size?: number; stroke?: string;",
+    "CloseIcon": "size?: number; stroke?: string;"
+  },
+  "tokensGlob": "src/styles/tokens/*.css",
+  "cssEntry": "src/styles/ask-network.css",
+  "readmeHeader": ".design-sync/conventions.md",
+  "libOverrides": {
+    "css.mjs": "copyTokens supports a package-relative tokensGlob with no tokens npm package (Beacon ships tokens as plain CSS in src/styles/tokens/)"
+  },
+  "overrides": {
+    "PromptPill": { "cardMode": "column" },
+    "AnswerPanel": { "cardMode": "single", "primaryStory": "Default" },
+    "AgentsReached": { "cardMode": "column" },
+    "NetworkConstellation": { "cardMode": "column" }
+  }
+}
