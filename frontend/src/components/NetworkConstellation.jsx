@@ -2,7 +2,7 @@
 // bound to hand-tuned SLOTS, a soft beacon glow cast from You, fluid curved edges, and
 // (while searching) a propagating "signal": flow along the lines → node arrival glow.
 // Nodes are tinted-metallic orbs; node/edge colors + the agent list come from props so the
-// parent state machine (live useRelayQuery data) stays untouched. An SVG graphic.
+// parent state machine (live useBeaconQuery data) stays untouched. An SVG graphic.
 
 import s from './NetworkConstellation.module.css'
 

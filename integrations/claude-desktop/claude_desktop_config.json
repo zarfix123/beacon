@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "beacon": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "cd /home/dennis/Projects/beacon/backend && exec /usr/bin/python3.10 -m scripts.mcp_beacon_server"
+      ]
+    }
+  }
+}

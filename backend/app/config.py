@@ -7,7 +7,7 @@ Implementation note: this uses a stdlib dataclass + a manual `.env` loader rathe
 `pydantic-settings`. The installed `pydantic 2.5.0` is incompatible with the installed
 `pydantic-settings` (it imports a newer pydantic internal), and the codebase already
 prefers a dependency-free `.env` loader (see app/claude/client.py). Same env semantics:
-RELAY_-prefixed overrides, loaded from backend/.env in dev.
+BEACON_-prefixed overrides, loaded from backend/.env in dev.
 """
 from __future__ import annotations
 
@@ -56,7 +56,7 @@ class Settings:
     model_synthesis: str = "claude-opus-4-8"
 
     # Search backend dispatch: "stub" until H8, then "cosine"/"hybrid".
-    relay_search: str = "stub"
+    beacon_search: str = "stub"
 
     anthropic_api_key: Optional[str] = None    # from env ANTHROPIC_API_KEY
 
@@ -65,15 +65,15 @@ class Settings:
 def get_settings() -> Settings:
     """Return the cached process-wide Settings instance, with env overrides applied.
 
-    Overridable via RELAY_SEARCH / RELAY_DEFAULT_ASKER / RELAY_TOP_K (the same vars the
+    Overridable via BEACON_SEARCH / BEACON_DEFAULT_ASKER / BEACON_TOP_K (the same vars the
     responder + search modules already read). The ANTHROPIC_API_KEY is also loaded
     independently by app.claude.client, so synthesis works regardless of this field.
     """
     _load_env_file()
     s = Settings()
-    s.relay_search = os.environ.get("RELAY_SEARCH", s.relay_search)
-    s.default_asker = os.environ.get("RELAY_DEFAULT_ASKER", s.default_asker)
-    if os.environ.get("RELAY_TOP_K"):
-        s.top_k = int(os.environ["RELAY_TOP_K"])
+    s.beacon_search = os.environ.get("BEACON_SEARCH", s.beacon_search)
+    s.default_asker = os.environ.get("BEACON_DEFAULT_ASKER", s.default_asker)
+    if os.environ.get("BEACON_TOP_K"):
+        s.top_k = int(os.environ["BEACON_TOP_K"])
     s.anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY", s.anthropic_api_key)
     return s

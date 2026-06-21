@@ -1,6 +1,6 @@
 # Beacon — Frontend (`Ask the Network`)
 
-The Beacon / Relay query UI: ask the network an engineering question, watch the
+The Beacon / Beacon query UI: ask the network an engineering question, watch the
 party agents light up, and read a synthesized, attributed, permission-gated answer.
 
 This is a faithful React port of the `Ask the Network` design (Claude Design project

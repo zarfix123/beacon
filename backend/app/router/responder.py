@@ -27,8 +27,8 @@ if TYPE_CHECKING:
 _REGISTRY: Optional["AgentRegistry"] = None
 
 # Self-sourced so Phase 2 doesn't depend on config.get_settings (a Phase-3 concern).
-_TOP_K = int(os.getenv("RELAY_TOP_K", "5"))
-_DEFAULT_ASKER = os.getenv("RELAY_DEFAULT_ASKER", "agent_helios")  # OQ-1
+_TOP_K = int(os.getenv("BEACON_TOP_K", "5"))
+_DEFAULT_ASKER = os.getenv("BEACON_DEFAULT_ASKER", "agent_helios")  # OQ-1
 
 
 def set_registry(registry: "AgentRegistry") -> None:

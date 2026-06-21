@@ -2,7 +2,7 @@
 
 Responsibility: the FROZEN `search(query, agent_id, top_k)` entry point
 (shared/contracts/search-interface.md). Single dispatch point: `_keyword_stub` until
-H8, `_cosine_search` behind RELAY_SEARCH=cosine. Returns ALL visibility tiers,
+H8, `_cosine_search` behind BEACON_SEARCH=cosine. Returns ALL visibility tiers,
 UNGATED, ordered by descending score, <= top_k, [] on no hit. Raises KeyError on
 unknown agent_id. NEVER gates/filters by visibility (retrieve-first, gate-second).
 """
@@ -23,13 +23,13 @@ _REGISTRY: Optional["AgentRegistry"] = None
 
 # "stub" (keyword overlap, default), "cosine" (pure dense), or "hybrid"
 # (BM25 + dense fused with RRF — the Phase-1.5 engine). All share the frozen shape.
-SEARCH_BACKEND = os.getenv("RELAY_SEARCH", "stub")
+SEARCH_BACKEND = os.getenv("BEACON_SEARCH", "stub")
 
 # Relevance floor: drop any result whose absolute dense cosine sim is below this, so a
 # genuinely off-topic query returns [] (no-hit) and a one-party query only surfaces the
 # relevant party (single-hit). 0.0 = off (default; preserves the frozen "return top_k"
-# behavior for the stub + existing tests). The demo sets RELAY_MIN_SIM in run.sh.
-RELEVANCE_FLOOR = float(os.getenv("RELAY_MIN_SIM", "0.0"))
+# behavior for the stub + existing tests). The demo sets BEACON_MIN_SIM in run.sh.
+RELEVANCE_FLOOR = float(os.getenv("BEACON_MIN_SIM", "0.0"))
 
 _TOKEN_RE = re.compile(r"\w+")
 

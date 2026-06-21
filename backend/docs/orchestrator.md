@@ -1,4 +1,4 @@
-# Relay — Backend Subsystem BUILD doc: Orchestrator
+# Beacon — Backend Subsystem BUILD doc: Orchestrator
 
 > **Status: PLAN / INDEX (not an implementation).** Code blocks below are
 > sketches and signatures, not finished functions. Owner: Dennis (backend).

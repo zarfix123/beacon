@@ -1,6 +1,6 @@
 # BUILD: Provenance Assembly & Verification (Claude Call)
 
-> **Status: BUILD PLAN / INDEX — not an implementation.** Owner: Dennis (backend). Subsystem of Relay (Berkeley AI Hackathon 2026). Read alongside the three frozen contracts in `shared/contracts/` and spec sections 3, 6, 9, 10, 11. This doc describes shapes, signatures, the Claude calls, and an ordered build path. Code blocks are sketches, not finished code.
+> **Status: BUILD PLAN / INDEX — not an implementation.** Owner: Dennis (backend). Subsystem of Beacon (Berkeley AI Hackathon 2026). Read alongside the three frozen contracts in `shared/contracts/` and spec sections 3, 6, 9, 10, 11. This doc describes shapes, signatures, the Claude calls, and an ordered build path. Code blocks are sketches, not finished code.
 
 ---
 

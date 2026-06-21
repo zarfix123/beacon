@@ -269,7 +269,7 @@ from . import embeddings
 import numpy as np, os, re
 
 _REGISTRY: AgentRegistry | None = None   # set at startup by build_registry() wiring
-SEARCH_BACKEND = os.getenv("RELAY_SEARCH", "stub")   # "stub" until H8, then "cosine"
+SEARCH_BACKEND = os.getenv("BEACON_SEARCH", "stub")   # "stub" until H8, then "cosine"
 
 def search(query: str, agent_id: str, top_k: int = 5) -> list[Chunk]:
     """FROZEN signature (search-interface.md). Single dispatch point.
@@ -304,7 +304,7 @@ def _cosine_search(query, agent, top_k) -> list[Chunk]:
     return [{**agent.index.chunks[i], "score": float((sims[i] + 1) / 2)} for i in order if sims[i] > 0]
 ```
 
-> **H8 swap:** flip `RELAY_SEARCH=cosine` (or replace `_cosine_search`'s body with a call into Hao's
+> **H8 swap:** flip `BEACON_SEARCH=cosine` (or replace `_cosine_search`'s body with a call into Hao's
 > module). Call sites in the orchestrator/gate never change — they only ever import `search()`.
 > If Hao delivers his own `search()` module, this file's `search()` becomes a one-line delegate to his,
 > preserving the KeyError-on-unknown-id and all-tiers guarantees.
@@ -400,7 +400,7 @@ the orchestrator owner knows the expected shapes; none are implemented in the fi
     "cache embeddings.")
 11. **`corpus.py` — embeddings mode.** Extend `load_agent_index(..., with_embeddings=True)` to load the
     `.npz` (or embed on cache miss) and attach `matrix` in `chunks` order.
-12. **`search.py` — cosine path.** Implement `_cosine_search()` (numpy) behind `RELAY_SEARCH=cosine`.
+12. **`search.py` — cosine path.** Implement `_cosine_search()` (numpy) behind `BEACON_SEARCH=cosine`.
 13. **H8 checkpoint swap.** Either flip the env flag to `cosine` (numpy fallback) or delegate
     `search()` to Hao's real module if delivered. Verify identical shape/guarantees; re-run step-8 tests.
     Sync with Hao on `EMBED_MODEL`/`EMBED_DIM` so query and corpus vectors match.

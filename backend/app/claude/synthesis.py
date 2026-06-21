@@ -35,7 +35,7 @@ async def synthesize(
     on_delta: Optional[Callable[[str], Awaitable[None]]] = None,
 ) -> str:
     """Compose the final cited answer from verified full items (SYNTH_MODEL,
-    max_tokens~300). Redacted items appear as existence-only. Empty-input guard
+    max_tokens~512). Redacted items appear as existence-only. Empty-input guard
     returns a graceful string; refusal/error -> deterministic fallback.
 
     When `on_delta` is given, the answer STREAMS: each text delta is forwarded to on_delta
@@ -58,10 +58,10 @@ async def synthesize(
     try:
         if on_delta is not None:
             text = await stream_text(model=SYNTH_MODEL, system=SYNTHESIS_SYSTEM, user=user,
-                                     on_delta=on_delta, max_tokens=320)
+                                     on_delta=on_delta, max_tokens=512)
         else:
             text = await complete_text(model=SYNTH_MODEL, system=SYNTHESIS_SYSTEM, user=user,
-                                       max_tokens=320)
+                                       max_tokens=512)
     except Exception:
         text = None
 

@@ -1,6 +1,6 @@
-# Relay — Demo Runbook
+# Beacon — Demo Runbook
 
-The one-page reference for running and narrating the demo. Relay is a permissioned
+The one-page reference for running and narrating the demo. Beacon is a permissioned
 knowledge-brokering network: an asking agent fans a question out to other parties, each
 party's **gate** decides what may cross its boundary (full / redacted / denied), answers are
 **verified** against their source, and the asker **synthesizes** one cited answer.
@@ -16,9 +16,9 @@ set in the environment, not just `.env`):
 
 | var | value | why |
 |---|---|---|
-| `RELAY_SEARCH` | `hybrid` | real engine: BM25 + dense (model2vec) + RRF |
-| `RELAY_TOP_K` | `2` | each party returns only its top-2 (clean cards) |
-| `RELAY_MIN_SIM` | `0.35` | relevance floor → off-topic = no-hit, one-party = single-hit |
+| `BEACON_SEARCH` | `hybrid` | real engine: BM25 + dense (model2vec) + RRF |
+| `BEACON_TOP_K` | `2` | each party returns only its top-2 (clean cards) |
+| `BEACON_MIN_SIM` | `0.35` | relevance floor → off-topic = no-hit, one-party = single-hit |
 
 - **UI:** http://localhost:5173 (the visual shell) — or http://localhost:5173/?debug for the
   walking-skeleton client (raw event stream; the guaranteed-working fallback).
@@ -82,6 +82,6 @@ which gives three distinct behaviors:
 
 - Backend: `backend/app/` (gate, claude boundary calls, router/orchestrator, retrieval).
 - Planted demo scenario: `backend/app/demo.py` (single source of truth; `demo_seed.py` writes it to the gitignored corpora).
-- Live client contract: `frontend/src/useRelayQuery.js` (the hook the components consume).
+- Live client contract: `frontend/src/useBeaconQuery.js` (the hook the components consume).
 - Walking skeleton: `frontend/src/components/LiveQueryDebug.jsx` (at `?debug`).
-- Tuning: `RELAY_MIN_SIM` (floor), `RELAY_TOP_K` (cards per party) — tune in `run.sh` during rehearsal.
+- Tuning: `BEACON_MIN_SIM` (floor), `BEACON_TOP_K` (cards per party) — tune in `run.sh` during rehearsal.

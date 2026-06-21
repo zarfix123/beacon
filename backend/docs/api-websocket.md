@@ -9,7 +9,7 @@
 > - Data model — `/home/dennis/Projects/beacon/shared/contracts/data-model.md`
 > - search() interface — `/home/dennis/Projects/beacon/shared/contracts/search-interface.md`
 > - API + WebSocket — `/home/dennis/Projects/beacon/shared/contracts/api-websocket.md`
-> - Spec — `/home/dennis/Projects/beacon/docs/relay-spec.md` (sections 5, 6, 9, 10, 11, 12)
+> - Spec — `/home/dennis/Projects/beacon/docs/beacon-spec.md` (sections 5, 6, 9, 10, 11, 12)
 
 ---
 
@@ -127,7 +127,7 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     settings = get_settings()
-    app = FastAPI(title="Relay Backend", lifespan=lifespan)
+    app = FastAPI(title="Beacon Backend", lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,   # e.g. ["http://localhost:5173", "http://localhost:3000"]
@@ -170,7 +170,7 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = None    # from env ANTHROPIC_API_KEY
 
     class Config:
-        env_prefix = "RELAY_"
+        env_prefix = "BEACON_"
         env_file = ".env"
 
 

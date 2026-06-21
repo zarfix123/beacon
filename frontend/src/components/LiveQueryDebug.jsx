@@ -1,14 +1,14 @@
 /**
  * LiveQueryDebug — the walking skeleton (Phase 4 step 4a).
  *
- * Barebones, real client over useRelayQuery: ask the locked query, watch the live frame
+ * Barebones, real client over useBeaconQuery: ask the locked query, watch the live frame
  * stream (ack -> agent-activated -> response-item -> done) drive cards + the synthesized
  * answer, and hit "Request access" to fire the grant-access targeted re-stream and watch the
  * one redacted card flip to full+verified. Ugly on purpose — this is the "the demo exists"
  * milestone and the guaranteed-working fallback. Mounted via App.jsx at ?debug.
  */
 import { useState } from 'react'
-import { useRelayQuery } from '../useRelayQuery.js'
+import { useBeaconQuery } from '../useBeaconQuery.js'
 import { DEFAULT_QUESTION } from './mockData.js'
 
 const COLORS = { full: '#3f7d57', redacted: '#b9802f', denied: '#8f8b85' }
@@ -16,11 +16,11 @@ const mono = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fon
 
 export default function LiveQueryDebug() {
   const [q, setQ] = useState(DEFAULT_QUESTION)
-  const r = useRelayQuery()
+  const r = useBeaconQuery()
 
   return (
     <div style={{ padding: 24, maxWidth: 920, margin: '0 auto', ...mono, color: '#1c1b19' }}>
-      <h2 style={{ margin: '0 0 4px' }}>Relay — live wire (walking skeleton)</h2>
+      <h2 style={{ margin: '0 0 4px' }}>Beacon — live wire (walking skeleton)</h2>
       <div style={{ color: '#666' }}>
         {r.connected ? '🟢 connected' : '🔴 disconnected'} · phase <b>{r.phase}</b> · query_id {r.queryId || '—'}
       </div>

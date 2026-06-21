@@ -1,4 +1,4 @@
-# Relay — Frozen Contract 1: Data Model
+# Beacon — Frozen Contract 1: Data Model
 
 > **Status: FROZEN (hour 0).** Changing any shape here requires a 2-minute sync between Dennis (backend) and Hao (retrieval + frontend). Until then, treat these record shapes as untouchable. Derived from spec section 8.
 

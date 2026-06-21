@@ -1,4 +1,4 @@
-# Relay Backend — BUILD: Grant-Access-Live (the hero beat)
+# Beacon Backend — BUILD: Grant-Access-Live (the hero beat)
 
 > **Status: BUILD PLAN (index, not implementation).** Owner: Dennis (backend). Frontend half (button + animation): Hao.
 > This is a plan/index — file responsibilities, signatures, Claude-call sketches, build order. Code blocks are **sketches**, not the final implementation.
