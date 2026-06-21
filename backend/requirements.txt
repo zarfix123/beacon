@@ -4,9 +4,10 @@
 fastapi
 uvicorn[standard]          # ASGI server + websockets extra
 pydantic>=2
-pydantic-settings
+# pydantic-settings        # REMOVED: incompatible with pinned pydantic 2.5.0; app/config.py
+#                            uses a stdlib dataclass + manual .env loader instead.
 anthropic>=0.40            # redaction / verification / synthesis Claude calls
-python-dotenv              # load ANTHROPIC_API_KEY in dev
+# python-dotenv            # not installed here; app/config.py + app/claude/client.py load .env manually
 numpy                      # cosine math + embedding matrices
 model2vec                  # static embeddings (potion-retrieval-32M) — numpy-only inference, NO torch
 rank-bm25                  # BM25 lexical channel for hybrid retrieval (RRF fusion)

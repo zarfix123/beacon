@@ -37,3 +37,19 @@ async def test_live_verification_true_and_false():
     bad = await verify_answer("The capital of France is Berlin.", source)
     assert good.verified is True
     assert bad.verified is False
+
+
+@requires_key
+async def test_live_synthesis_cites_and_grounds():
+    from app.claude.synthesis import synthesize
+    items = [
+        {"answer": "The gateway rate limit was lowered to 60 req/min during the retry refactor.",
+         "source_party": "Northwind Robotics", "source_doc_title": "RetryPolicy.md",
+         "decision": "full", "verified": True, "chunk_id": "nw_c1", "source_agent_id": "agent_northwind"},
+        {"answer": "auth-core caps token issuance at 30 req/min per service.",
+         "source_party": "Quanta Systems", "source_doc_title": "throttle.yaml",
+         "decision": "full", "verified": True, "chunk_id": "qa_c1", "source_agent_id": "agent_quanta"},
+    ]
+    answer = await synthesize("Who changed the rate limit on the payments path and what is it now?", items, [])
+    assert answer and "[1]" in answer and "[2]" in answer       # inline numbered citations
+    assert "60" in answer and "30" in answer                     # grounded in the supplied facts

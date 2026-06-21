@@ -5,7 +5,9 @@ together. Contract example shape: "q_8f3a2c". This is a SKELETON — no logic.
 """
 from __future__ import annotations
 
+import uuid
+
 
 def new_query_id() -> str:
-    """Return a fresh opaque query id, e.g. "q_" + short hex."""
-    raise NotImplementedError("new_query_id is a skeleton stub")
+    """Return a fresh opaque query id: 'q_' + 6 hex (contract example "q_8f3a2c")."""
+    return "q_" + uuid.uuid4().hex[:6]

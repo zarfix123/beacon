@@ -8,8 +8,9 @@ orchestration logic — it calls into both. This is a SKELETON — no logic.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
+from app.agents.index import ChunkNotFoundError
 from app.models import Visibility
 
 if TYPE_CHECKING:
@@ -52,15 +53,37 @@ class GrantAccessService:
         that row (isolation preserved). Idempotent: already-public -> no-op, still
         returns "public". Raises ChunkNotFoundError on miss.
         """
-        raise NotImplementedError("toggle_visibility is a skeleton stub")
+        try:
+            agent, _chunk = self._registry.find_chunk(chunk_id)
+        except KeyError:
+            raise ChunkNotFoundError(chunk_id)
+        return agent.index.set_visibility(chunk_id, target)
 
     async def grant_and_rerun(self, chunk_id: str, query_id: str) -> GrantResult:
         """Validate the query_id, toggle the chunk, and build the ACK. The replay is
-        scheduled by the route (BackgroundTasks) so the HTTP ACK is not blocked."""
-        raise NotImplementedError("grant_and_rerun is a skeleton stub")
+        scheduled by the route (BackgroundTasks) so the HTTP ACK is not blocked.
 
-    async def replay(self, query_id: str) -> None:
-        """Re-invoke the orchestrator for the stored query on the SAME query_id,
-        streaming a fresh agent-activated -> response-item -> done cycle. Raises
-        UnknownQueryError if the run context is missing."""
-        raise NotImplementedError("replay is a skeleton stub")
+        Validation happens BEFORE the toggle so an unknown query_id never mutates state.
+        """
+        if self._run_registry.get(query_id) is None:
+            raise UnknownQueryError(query_id)
+        new_visibility = self.toggle_visibility(chunk_id, target="public")
+        return GrantResult(
+            chunk_id=chunk_id, new_visibility=new_visibility,
+            query_id=query_id, rerunning=True,
+        )
+
+    async def replay(self, query_id: str, changed_chunk_id: Optional[str] = None) -> None:
+        """Re-invoke the orchestrator for the stored query on the SAME query_id.
+
+        Targeted: only the granted chunk's party re-dispatches (changed_chunk_id), the
+        rest are reused from the cache. Uses run_guarded so a mid-stream error still emits
+        a terminal done (the hero beat never hangs). Raises UnknownQueryError if the run
+        context is missing.
+        """
+        ctx = self._run_registry.get(query_id)
+        if ctx is None:
+            raise UnknownQueryError(query_id)
+        await self._orchestrator.run_guarded(
+            ctx.query, ctx.from_agent, ctx.query_id, changed_chunk_id=changed_chunk_id,
+        )

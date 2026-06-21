@@ -5,9 +5,8 @@ Responsibility: construct the FastAPI app, run the startup wiring inside `lifesp
 Orchestrator + RunRegistry + GrantAccessService into app.state), add CORSMiddleware,
 and mount the HTTP / WS / grant-access routers.
 
-This module shows the WIRING with NotImplementedError stubs — it does NOT implement
-the components it imports. Run target: `uvicorn app.main:app --reload --port 8000`.
-This is a SKELETON.
+This module owns the WIRING; the components it imports are implemented in their own
+modules. Run target: `uvicorn app.main:app --reload --port 8000`.
 """
 from __future__ import annotations
 
@@ -25,7 +24,7 @@ from app.run_registry import RunRegistry
 from app.grant_access.service import GrantAccessService
 from app.retrieval import search as search_module
 from app.router.router import Router
-from app.router.responder import respond_for_agent
+from app.router.responder import respond_for_agent, set_registry as set_responder_registry
 from app.api import http as http_routes
 from app.api import ws as ws_routes
 from app.grant_access import routes as grant_access_routes
@@ -43,16 +42,17 @@ async def lifespan(app: FastAPI):
        GrantAccessService; stash all into app.state;
     6. (middleware + routers are added in create_app()).
 
-    SKELETON — the wiring is shown but the components raise NotImplementedError.
     """
     # ---- 1. settings ----
-    settings = get_settings()                                       # NotImplementedError (skeleton)
+    settings = get_settings()
 
     # ---- 2. registry (3 isolated agents) ----
     registry = build_registry(with_embeddings=(settings.relay_search == "cosine"))
 
-    # ---- 3. wire search ----
+    # ---- 3. wire search + responder (both need the registry: search for chunks,
+    #         responder for party_name resolution on the gated items) ----
     search_module.set_registry(registry)
+    set_responder_registry(registry)
 
     # ---- 4. event plumbing ----
     bus = EventBus()
@@ -62,11 +62,16 @@ async def lifespan(app: FastAPI):
     router = Router(registry=registry, bus=bus, responder=respond_for_agent)
 
     async def _emit(event: dict) -> None:
-        # Orchestrator/router emit into the bus; the WSManager forwards to sockets.
-        raise NotImplementedError("lifespan emit sink is a skeleton stub")
+        # Orchestrator/router emit into the bus; the WSManager pump forwards to sockets.
+        await bus.emit(event["query_id"], event)
 
-    orchestrator = Orchestrator(registry=registry, router=router, emit=_emit, top_k=settings.top_k)
+    # run_registry is built BEFORE the orchestrator: it holds both the RunContext (for
+    # grant-access replay) and the per-query_id item cache the targeted replay reuses.
     run_registry = RunRegistry()
+    orchestrator = Orchestrator(
+        registry=registry, router=router, emit=_emit, run_registry=run_registry,
+        top_k=settings.top_k,
+    )
     grant_access_service = GrantAccessService(
         registry=registry, orchestrator=orchestrator, run_registry=run_registry,
     )
@@ -85,11 +90,8 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    """Construct the FastAPI app: lifespan, CORS, and mounted routers.
-
-    SKELETON — settings access raises NotImplementedError until config.py is built.
-    """
-    settings = get_settings()                                       # NotImplementedError (skeleton)
+    """Construct the FastAPI app: lifespan, CORS, and mounted routers."""
+    settings = get_settings()
     app = FastAPI(title="Relay Backend", lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
@@ -104,5 +106,5 @@ def create_app() -> FastAPI:
     return app
 
 
-# `uvicorn app.main:app` — construction raises NotImplementedError in the skeleton.
+# `uvicorn app.main:app` — the ASGI app the server imports.
 app = create_app()

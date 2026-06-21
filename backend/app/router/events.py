@@ -12,10 +12,16 @@ from app.models import ResponseItem
 def agent_activated_event(query_id: str, agent_id: str, party_name: str) -> dict:
     """Build the frozen `agent-activated` frame:
     {type, query_id, agent_id, party_name, status:"searching"}."""
-    raise NotImplementedError("agent_activated_event is a skeleton stub")
+    return {
+        "type": "agent-activated",
+        "query_id": query_id,
+        "agent_id": agent_id,
+        "party_name": party_name,
+        "status": "searching",          # single MVP value, frozen
+    }
 
 
 def response_item_event(query_id: str, item: ResponseItem) -> dict:
     """Build the frozen `response-item` frame: {type:"response-item", query_id, ...item}.
     The item already carries the 5 canonical fields + chunk_id + source_agent_id."""
-    raise NotImplementedError("response_item_event is a skeleton stub")
+    return {"type": "response-item", "query_id": query_id, **item}

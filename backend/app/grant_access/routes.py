@@ -23,6 +23,19 @@ async def grant_access(
     background: BackgroundTasks,
     svc: GrantAccessService = Depends(get_grant_access_service),
 ) -> schemas.GrantAccessResponse:
-    """Toggle one chunk's visibility, ACK, and schedule the replay on the same
-    query_id. SKELETON — no logic."""
-    raise NotImplementedError("grant_access route is a skeleton stub")
+    """Toggle one chunk's visibility, ACK immediately, and schedule the TARGETED replay
+    on the same query_id (only the granted party re-streams). ChunkNotFoundError /
+    UnknownQueryError -> 404."""
+    try:
+        result = await svc.grant_and_rerun(body.chunk_id, body.query_id)
+    except (ChunkNotFoundError, UnknownQueryError) as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    # Replay AFTER the ACK so the HTTP response isn't blocked on the re-run.
+    background.add_task(svc.replay, result.query_id, result.chunk_id)
+    return schemas.GrantAccessResponse(
+        chunk_id=result.chunk_id,
+        new_visibility=result.new_visibility,
+        query_id=result.query_id,
+        rerunning=result.rerunning,
+    )
