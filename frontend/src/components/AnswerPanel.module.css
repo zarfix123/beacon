@@ -31,21 +31,68 @@
   text-wrap: pretty;
 }
 
-/* inline numbered citation chips */
+/* inline citation markers — sleek clickable footnote numerals (no heavy box) */
 .cite, .citeLock {
+  appearance: none; -webkit-appearance: none;
   display: inline-flex;
   align-items: center;
-  min-width: 15px;
-  height: 15px;
-  padding: 0 3px;
+  justify-content: center;
+  gap: 2px;
+  padding: 1px 3px;
+  margin: 0 1px;
+  border: none;
+  background: transparent;
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: 9.5px;
-  vertical-align: 3px;
-  margin: 0 1px;
+  font-size: .64em;                    /* scales with the prose (16.5px inline / 18px reader) */
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: super;               /* footnote lift that tracks the surrounding font size */
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
-.cite { justify-content: center; background: var(--ink); color: var(--ivory); }
-.citeLock { gap: 2px; background: var(--warn-50); color: var(--warn-700); }
+.cite { color: var(--signal-600); }
+.cite:hover, .cite[aria-expanded="true"] { background: var(--signal-50); color: var(--signal-700); }
+.citeLock { color: var(--warn-700); }
+.citeLock:hover, .citeLock[aria-expanded="true"] { background: var(--warn-50); color: var(--warn-700); }
+.cite:focus-visible, .citeLock:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+.citePending { color: var(--text-muted); pointer-events: none; }   /* provenance not streamed in yet */
+
+/* per-citation source popover — portaled to <body>, fixed-positioned, centered under the number */
+.citePopover {
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: var(--z-popover);
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 11px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 30px rgba(15, 14, 13, .18);
+  text-align: left;
+  cursor: default;
+  animation: cite-pop var(--dur-fast) var(--ease-out) both;
+}
+.citePopHead { display: flex; align-items: center; gap: 6px; }
+.citePopBadge { margin-left: auto; display: inline-flex; flex: none; }
+.citeSnippet {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* keep the translateX(-50%) centering through the entrance (bc-rise would clobber it) */
+@keyframes cite-pop {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
 
 /* eyebrow-row actions: sources pill + expand control, pushed right */
 .eyebrowActions { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
@@ -96,7 +143,7 @@
   font-size: 10px;
   flex: none;
 }
-.num { background: var(--ink); color: var(--ivory); }
+.num { background: var(--signal-50); color: var(--signal-700); }
 .numLock { background: var(--warn-50); color: var(--warn-700); }
 
 .party { font-size: 12.5px; color: var(--text-secondary); font-weight: 500; }
@@ -152,20 +199,82 @@
 
 @keyframes bc-rise { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }
 
-/* ===== expand-to-large reader: a right-half slide-over for long streamed answers ===== */
-.reader {
-  position: fixed; top: 0; right: 0; height: 100dvh;
-  width: min(50vw, 640px); min-width: 360px; max-width: calc(100vw - 32px);
-  background: var(--surface-card);
-  border-left: 1px solid var(--border-subtle);
-  box-shadow: -18px 0 52px rgba(15, 14, 13, .16);
-  display: flex; flex-direction: column;
-  transform: translateX(100%);
-  transition: transform 420ms var(--ease-out);
-  will-change: transform;
-  z-index: 90;
+/* ===== hand-off modal: a copyable Claude Code prompt ===== */
+.handoffOverlay {
+  position: fixed; inset: 0; z-index: var(--z-popover);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(15, 14, 13, .34); backdrop-filter: blur(3px);
+  animation: handoff-fade var(--dur-fast) var(--ease-out) both;
 }
-.readerOpen { transform: translateX(0); }
+.handoffModal {
+  width: min(540px, 100%); max-height: 78vh;
+  display: flex; flex-direction: column; gap: 12px; padding: 18px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);
+  box-shadow: 0 24px 70px rgba(15, 14, 13, .28);
+  animation: handoff-rise var(--dur-base) var(--ease-out) both;
+}
+.handoffHead { display: flex; align-items: center; justify-content: space-between; }
+.handoffHint { margin: 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+.handoffText {
+  flex: 1; min-height: 240px; resize: none;
+  padding: 12px 13px;
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  font-family: var(--font-mono); font-size: 12px; line-height: 1.55;
+  color: var(--text-primary); white-space: pre-wrap;
+}
+.handoffText:focus { outline: none; border-color: var(--border-default); }
+.handoffActions { display: flex; justify-content: flex-end; }
+.handoffCopy {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 38px; padding: 0 16px;
+  border: none; border-radius: var(--radius-md);
+  background: var(--ink); color: var(--ivory);
+  font-family: var(--font-sans); font-weight: 500; font-size: 13px; cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.handoffCopy:hover { background: var(--near-black); transform: translateY(-1px); }
+.handoffCopy:active { transform: scale(.98); }
+@keyframes handoff-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes handoff-rise { from { opacity: 0; transform: translateY(10px) scale(.985) } to { opacity: 1; transform: translateY(0) scale(1) } }
+
+/* ===== expand-to-large reader: grows from the answer card's corner to fill its LEFT side =====
+   Anchored at the card's own top-left (top:80 ≈ topbar + margin) and scaled from that corner.
+   Open AND close are ONE composited transform+opacity transition — no keyframe/animation mix,
+   which is what made the close snap (the panel held the animation's fill value and couldn't
+   transition cleanly out of it). The transition property of the *destination* state wins, so
+   each direction gets its own curve: a long ease-out settle in, a smooth ease-in-out collapse out.
+   Right edge stops at the center gutter; bottom stops above the centered search pill. */
+.reader {
+  position: fixed;
+  top: 80px; left: 24px; right: calc(50% + 12px); bottom: 104px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 70px rgba(15, 14, 13, .20);
+  display: flex; flex-direction: column;
+  transform-origin: top left;
+  opacity: 0;
+  transform: scale(.7);              /* clearly smaller so the grow/shrink is visible */
+  pointer-events: none;
+  /* CLOSE: shrink back into the corner — opacity tracks the transform so you SEE it shrink */
+  transition:
+    transform 380ms var(--ease-in-out),
+    opacity 360ms var(--ease-in-out);
+  will-change: transform, opacity;
+  z-index: var(--z-overlay);
+}
+.readerOpen {
+  pointer-events: auto;
+  opacity: 1;
+  transform: scale(1);
+  /* OPEN: grow out of the corner. Opacity fades in fast (220ms) so you watch the longer
+     560ms scale-up happen, instead of it just appearing at full size. */
+  transition:
+    transform 560ms var(--ease-out),
+    opacity 220ms var(--ease-out);
+}
 
 .readerHead {
   display: flex; align-items: center; justify-content: space-between;
@@ -182,6 +291,7 @@
 .readerProse {
   font-family: var(--font-serif); font-size: 18px; line-height: 1.62;
   letter-spacing: -.1px; color: var(--text-primary); margin: 0; text-wrap: pretty;
+  max-width: 760px;   /* readable column inside the now-wide panel */
 }
 .readerSources {
   margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--border-subtle);
@@ -191,7 +301,13 @@
   font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px;
 }
 
-/* the slide is a transition (not animation), so it needs a LOCAL reduced-motion guard */
+/* short viewports: pull the reader's top/bottom in so the grow isn't cramped */
+@media (max-height: 640px) {
+  .reader { top: 64px; bottom: 88px; }
+}
+
+/* reduced motion: drop the reader transitions AND the card / popover entrance animations */
 @media (prefers-reduced-motion: reduce) {
-  .reader { transition: none; }
+  .reader, .readerOpen { transition: none; }
+  .card, .citePopover, .popover, .confirm, .handoffOverlay, .handoffModal { animation: none; }
 }

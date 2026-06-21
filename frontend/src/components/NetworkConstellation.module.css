@@ -17,7 +17,7 @@
 .scene {
   transform-box: view-box;
   transform-origin: 0 0;
-  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 760ms var(--ease-out);
   will-change: transform;
 }
 
@@ -31,6 +31,7 @@
   stroke-dasharray: 0.13 0.87;
   stroke-dashoffset: 1;
   stroke-linecap: round;
+  opacity: 0;                 /* hidden until its delay — never paints before the network is built */
   filter: drop-shadow(0 0 5px currentColor) drop-shadow(0 0 2px currentColor);
   animation: bc-flow 1.4s linear infinite;
 }
@@ -40,11 +41,13 @@
   transform-box: fill-box;
   transform-origin: center;
   filter: blur(7px);
+  opacity: 0;                 /* hidden until its delay — never glow before the orb is revealed */
   animation: bc-halo 1.9s ease-in-out infinite;
 }
 
-/* keyframes co-located here so CSS Modules scopes name + reference together */
-@keyframes bc-flow { to { stroke-dashoffset: 0 } }
+/* keyframes co-located here so CSS Modules scopes name + reference together.
+   bc-flow holds opacity:1 while running so the base opacity:0 only hides it pre-delay. */
+@keyframes bc-flow { from { opacity: 1; stroke-dashoffset: 1 } to { opacity: 1; stroke-dashoffset: 0 } }
 @keyframes bc-halo { 0%, 100% { opacity: .12 } 50% { opacity: .5 } }
 
 /* resting beacon glow: a calm centered bloom that breathes slowly.
@@ -79,3 +82,41 @@
 .sat { animation: bc-satin 360ms var(--ease-out, ease) both; }
 .satDot { transition: fill 380ms var(--ease-out, ease); }
 @keyframes bc-satin { from { opacity: 0 } to { opacity: 1 } }
+
+/* ===== dramatic entrance: trace each You→party line, then bloom the node (staggered) =====
+   Driven by per-party CSS vars set inline (--draw-delay / --bloom-delay / --label-delay).
+   `both` fill holds the FROM state through the delay, so each line/node stays hidden until
+   its turn, then draws/pops — building the network one party at a time. */
+.edgeDraw {
+  stroke-dasharray: 1;          /* pathLength="1" → one dash spans the whole curve */
+  stroke-dashoffset: 1;         /* start fully hidden */
+  stroke-linecap: butt;         /* no round-cap blob blooming at You as the draw starts */
+  animation: bc-draw 700ms var(--ease-out) var(--draw-delay, 0ms) both;
+}
+@keyframes bc-draw { to { stroke-dashoffset: 0 } }
+
+.nodeBloom {
+  /* swipe: uncover the full-size disc from its branch-contact side, slow enough to watch.
+     The start clip (--wipe-from) is set per node in the JSX; we wipe it open to nothing. */
+  animation: bc-wipe 900ms var(--ease-in-out) var(--bloom-delay, 0ms) both;
+}
+@keyframes bc-wipe {
+  from { clip-path: var(--wipe-from, inset(0 0 0 100%)); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+.nodeLabel {
+  animation: bc-labelin 420ms var(--ease-out, ease) var(--label-delay, 0ms) both;
+}
+@keyframes bc-labelin { from { opacity: 0 } to { opacity: 1 } }
+
+/* entrance is decorative — collapse it to an instant, fully-built network for reduced motion,
+   and stop the steady-state loops/transient glows (keep a still, readable "active" state) */
+@media (prefers-reduced-motion: reduce) {
+  .edgeDraw { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; }
+  .nodeBloom, .nodeLabel { animation: none; }
+  .flow { animation: none; opacity: .6; }
+  .halo { animation: none; opacity: .3; }
+  .land { animation: none; opacity: 0; }
+  .glow, .glowSearching { animation: none; }
+}

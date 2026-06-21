@@ -9,6 +9,17 @@ import s from './NetworkConstellation.module.css'
 const YOU = [320, 235]
 const FOCUS_ZOOM = 2.4
 
+// Entrance choreography (ms). Mirrors the .edgeDraw / .nodeBloom durations in the CSS.
+// All branches extend simultaneously (STAGGER = 0) — the whole network unfurls in one breath.
+// Bump STAGGER back up if you ever want the parties to build one-by-one again.
+const STAGGER = 0                                         // 0 = all parties build together
+const BLOOM = 900                                         // node reveal (wipe) duration (mirror of CSS) — slow enough to watch
+const drawDelay = (i) => i * STAGGER                      // line starts drawing
+const bloomDelay = (i) => i * STAGGER + 420               // node starts wiping in as the line lands
+const labelDelay = (i) => i * STAGGER + 900               // label fades up as the disc fills
+const haloDelay = (i) => i * STAGGER + 420 + BLOOM + 40    // glow appears only AFTER the disc is fully revealed
+const flowDelay = (i) => i * STAGGER + 420 + BLOOM + 160   // pulse runs the wire a beat later
+
 // Hand-tuned node positions + their curved You→node edge paths. Live responders bind to
 // these in order (demo = 2 → the two balanced side slots). Keep the bespoke geometry.
 const SLOTS = [
@@ -45,7 +56,14 @@ export default function NetworkConstellation({
   }
 
   return (
-    <div className={s.stage}>
+    // While zoomed into a node, a click anywhere on the constellation background zooms back out
+    // (and onClearFocus collapses that party's rows). The answer panel, agents tab, and topbar
+    // float on top as separate elements, so their clicks never reach this handler.
+    <div
+      className={s.stage}
+      onClick={focus ? onClearFocus : undefined}
+      style={focus ? { cursor: 'zoom-out' } : undefined}
+    >
       <svg className={s.svg} viewBox="0 0 640 470" width="100%" preserveAspectRatio="xMidYMid meet">
         <defs>
           {/* sleek: a shallow soft shadow for a slight lift, not a floating ball */}
@@ -77,11 +95,12 @@ export default function NetworkConstellation({
 
         <g className={s.scene} style={sceneStyle}>
 
-          {/* fluid curved edges: soft glow underlay + crisp line */}
-          {placed.map((n) => (
-            <g key={n.agentId}>
-              <path d={n.edge} fill="none" stroke={n.color} strokeOpacity="0.16" strokeWidth="5" strokeLinecap="round" className={s.edge} />
-              <path d={n.edge} fill="none" stroke={n.color} strokeOpacity="0.55" strokeWidth="1.6" strokeLinecap="round" className={s.edge} />
+          {/* fluid curved edges: soft glow underlay + crisp line. On entrance each one DRAWS
+              outward from You (staggered per party) via the .edgeDraw stroke-dashoffset sweep. */}
+          {placed.map((n, i) => (
+            <g key={n.agentId} style={{ '--draw-delay': `${drawDelay(i)}ms` }}>
+              <path d={n.edge} pathLength="1" fill="none" stroke={n.color} strokeOpacity="0.16" strokeWidth="5" strokeLinecap="round" className={`${s.edge} ${s.edgeDraw}`} />
+              <path d={n.edge} pathLength="1" fill="none" stroke={n.color} strokeOpacity="0.55" strokeWidth="1.6" strokeLinecap="round" className={`${s.edge} ${s.edgeDraw}`} />
             </g>
           ))}
 
@@ -92,13 +111,14 @@ export default function NetworkConstellation({
 
           {isSearching && (
             <>
-              {/* a blue light travels from You out to each node, looping (staggered) */}
+              {/* a blue light travels from You out to each node, looping. Starts AFTER that
+                  party's line has finished drawing (draw delay i*0.48s + ~0.7s draw). */}
               {placed.map((n, i) => (
-                <path key={n.agentId} d={n.edge} pathLength="1" fill="none" stroke="currentColor" strokeWidth="3" className={s.flow} style={{ color: accent, animationDelay: `${i * 0.24}s` }} />
+                <path key={n.agentId} d={n.edge} pathLength="1" fill="none" stroke="currentColor" strokeWidth="3" className={s.flow} style={{ color: accent, animationDelay: `${flowDelay(i)}ms` }} />
               ))}
-              {/* arrival glow behind each agent node */}
+              {/* arrival glow behind each agent node — begins as the node finishes blooming */}
               {placed.map((n, i) => (
-                <circle key={n.agentId} cx={n.pos[0]} cy={n.pos[1]} r="17" fill={accent} className={s.halo} style={{ animationDelay: `${i * 0.5}s` }} />
+                <circle key={n.agentId} cx={n.pos[0]} cy={n.pos[1]} r="17" fill={accent} className={s.halo} style={{ animationDelay: `${haloDelay(i)}ms` }} />
               ))}
             </>
           )}
@@ -126,6 +146,13 @@ export default function NetworkConstellation({
           {placed.map((n, i) => {
             const sats = n.cards && n.cards.length > 1 ? n.cards : []
             const dir = Math.atan2(n.pos[1] - 235, n.pos[0] - 320) // radiate outward, away from You
+            // node reveal: a clip-path "swipe" that uncovers the full-size disc from its
+            // branch-contact side (the edge facing You). Axis + side picked from where You sits,
+            // so the straight leading edge is ~perpendicular to the branch.
+            const toYou = [320 - n.pos[0], 235 - n.pos[1]]
+            const wipeFrom = Math.abs(toYou[0]) >= Math.abs(toYou[1])
+              ? (toYou[0] > 0 ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)')   // reveal from right : left
+              : (toYou[1] > 0 ? 'inset(100% 0 0 0)' : 'inset(0 0 100% 0)')   // reveal from bottom : top
             return (
               <g key={n.agentId}>
                 {sats.map((c, j) => {
@@ -139,10 +166,12 @@ export default function NetworkConstellation({
                     </g>
                   )
                 })}
-                <MetalNode cx={n.pos[0]} cy={n.pos[1]} r={17} col={n.color} delay={isResults ? `${i * 110}ms` : undefined}>
-                  <text x={n.pos[0]} y={n.pos[1]} textAnchor="middle" dominantBaseline="central" fontFamily="Hanken Grotesk, sans-serif" fontSize="15" fontWeight="600" fill="#fff">{n.letter}</text>
-                </MetalNode>
-                <text x={n.pos[0]} y={n.pos[1] + 34} textAnchor="middle" fontFamily="Hanken Grotesk, sans-serif" fontSize="12.5" fontWeight="600" fill="var(--text-primary)">{n.label}</text>
+                <g className={s.nodeBloom} style={{ '--bloom-delay': `${bloomDelay(i)}ms`, '--wipe-from': wipeFrom }}>
+                  <MetalNode cx={n.pos[0]} cy={n.pos[1]} r={17} col={n.color} delay={isResults ? `${i * 110}ms` : undefined}>
+                    <text x={n.pos[0]} y={n.pos[1]} textAnchor="middle" dominantBaseline="central" fontFamily="Hanken Grotesk, sans-serif" fontSize="15" fontWeight="600" fill="#fff">{n.letter}</text>
+                  </MetalNode>
+                </g>
+                <text x={n.pos[0]} y={n.pos[1] + 34} textAnchor="middle" fontFamily="Hanken Grotesk, sans-serif" fontSize="12.5" fontWeight="600" fill="var(--text-primary)" className={s.nodeLabel} style={{ '--label-delay': `${labelDelay(i)}ms` }}>{n.label}</text>
               </g>
             )
           })}

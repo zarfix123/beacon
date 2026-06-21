@@ -33,6 +33,8 @@
   --z-control: 7; /* prompt dock, reset */
   --z-panel:   6; /* answer / agents panels */
   --z-hint:    5; /* passive status pill */
+  --z-overlay: 20; /* expand-to-large reader (sits above chrome) */
+  --z-popover: 30; /* citation / source popovers (above everything) */
 
   /* ---- Borders ---- */
   --border-hairline: 1px;
@@ -49,7 +51,9 @@
 
   /* ---- Motion ---- */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
-  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1); /* @kind other */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1); /* decel — draws, grows, settles */
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1); /* symmetric — overlay close */
+  --ease-spring:   cubic-bezier(0.34, 1.4, 0.5, 1); /* gentle overshoot — node/button pop */
   --dur-fast:   120ms; /* @kind other */
   --dur-base:   200ms; /* @kind other */
   --dur-slow:   360ms; /* @kind other */

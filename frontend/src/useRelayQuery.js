@@ -24,10 +24,15 @@
  *   requestAccess(chunkId)  POST /grant_access; the targeted re-stream upserts the flipped card
  *   reset()                 POST /demo/reset (re-arm tiers) + clear local state
  */
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 
 const WS_URL = 'ws://localhost:8000/ws/query'
 const HTTP = 'http://localhost:8000'
+
+// Floor on the "searching" phase: even when the backend answers faster than the network
+// animation, hold the searching state at least this long so the blue signal visibly reaches
+// the nodes before results/generation reveal. Single knob — tune to taste.
+const MIN_SEARCH_MS = 2700
 
 const INITIAL = {
   phase: 'idle',
@@ -89,8 +94,10 @@ function reducer(state, action) {
 
 export function useRelayQuery() {
   const [state, dispatch] = useReducer(reducer, INITIAL)
+  const [floorReached, setFloorReached] = useState(true) // searching-phase floor (true = nothing held)
   const wsRef = useRef(null)
   const pendingRef = useRef(null) // question queued until the socket opens
+  const floorTimerRef = useRef(null)
 
   useEffect(() => {
     const ws = new WebSocket(WS_URL)
@@ -108,8 +115,14 @@ export function useRelayQuery() {
     return () => ws.close()
   }, [])
 
+  useEffect(() => () => clearTimeout(floorTimerRef.current), []) // clear the floor timer on unmount
+
   const submit = useCallback((question) => {
     dispatch({ type: 'submit' })
+    // start the searching-phase floor so a fast answer can't skip the network animation
+    setFloorReached(false)
+    clearTimeout(floorTimerRef.current)
+    floorTimerRef.current = setTimeout(() => setFloorReached(true), MIN_SEARCH_MS)
     const ws = wsRef.current
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: 'query', query: question }))
@@ -129,6 +142,8 @@ export function useRelayQuery() {
   }, [state.queryId])
 
   const reset = useCallback(async () => {
+    clearTimeout(floorTimerRef.current)
+    setFloorReached(true)
     await fetch(`${HTTP}/demo/reset`, { method: 'POST' }).catch(() => {})
     dispatch({ type: 'reset' })
   }, [])
@@ -136,8 +151,14 @@ export function useRelayQuery() {
   const agents = useMemo(() => Object.values(state.agentsById), [state.agentsById])
   const cards = useMemo(() => Object.values(state.cardsById), [state.cardsById])
 
+  // Hold the exposed phase at 'searching' until the floor elapses — the data keeps accumulating
+  // underneath, but the UI doesn't reveal results/generation until the network animation has run.
+  const phase = (!floorReached && (state.phase === 'synthesizing' || state.phase === 'done'))
+    ? 'searching'
+    : state.phase
+
   return {
-    phase: state.phase,
+    phase,
     connected: state.connected,
     queryId: state.queryId,
     agents,

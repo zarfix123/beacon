@@ -2,7 +2,7 @@
 // agents panel, and prompt from the live backend via useRelayQuery (one consumer; the
 // visual children stay presentational). phase idle|searching|done → empty|searching|results.
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRelayQuery } from '../useRelayQuery.js'
 import NetworkConstellation from './NetworkConstellation.jsx'
 import AnswerPanel from './AnswerPanel.jsx'
@@ -32,9 +32,6 @@ export default function AskTheNetwork() {
   const [expanded, setExpanded] = useState({})            // by chunk_id
   const [focus, setFocus] = useState(null)                // zoomed agent_id (mirrors open row)
   const [requestingChunkId, setRequestingChunkId] = useState(null)
-  const [handedOff, setHandedOff] = useState(false)
-  const hRef = useRef()
-  useEffect(() => () => clearTimeout(hRef.current), [])
 
   const isEmpty = r.phase === 'idle'
   const isSearching = r.phase === 'searching'
@@ -50,11 +47,11 @@ export default function AskTheNetwork() {
 
   const submit = () => {
     if (isSearching || !question.trim()) return
-    setExpanded({}); setFocus(null); setRequestingChunkId(null); setHandedOff(false)
+    setExpanded({}); setFocus(null); setRequestingChunkId(null)
     r.submit(question)
   }
   const reset = () => {
-    setExpanded({}); setFocus(null); setRequestingChunkId(null); setHandedOff(false)
+    setExpanded({}); setFocus(null); setRequestingChunkId(null)
     r.reset()
   }
   const request = (chunkId) => {
@@ -63,11 +60,6 @@ export default function AskTheNetwork() {
     setRequestingChunkId(chunkId)
     if (card) setFocus(card.source_agent_id) // zoom to the party as the request travels
     r.requestAccess(chunkId)
-  }
-  const handoff = () => {
-    setHandedOff(true)
-    clearTimeout(hRef.current)
-    hRef.current = setTimeout(() => setHandedOff(false), 4500)
   }
   const toggle = (chunkId) => {
     const card = r.cards.find((c) => c.chunk_id === chunkId)
@@ -149,7 +141,7 @@ export default function AskTheNetwork() {
           focus={focus} onClearFocus={clearFocus}
         />
 
-        {isResults && <AnswerPanel answer={r.answer} provenance={r.provenance} handedOff={handedOff} onHandoff={handoff} />}
+        {isResults && <AnswerPanel answer={r.answer} provenance={r.provenance} cards={cards} question={question} />}
 
         {isResults && (
           <AgentsReached

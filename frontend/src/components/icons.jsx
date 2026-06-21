@@ -4,7 +4,7 @@
 
 import {
   Broadcast, Check, Lock, CaretDown, Shield,
-  ArrowRight, ArrowClockwise, ArrowsLeftRight, ArrowsOutSimple, X,
+  ArrowRight, ArrowClockwise, ArrowsLeftRight, ArrowsOutSimple, X, Copy,
 } from '@phosphor-icons/react'
 
 const W = 'bold' // single global weight
@@ -58,4 +58,8 @@ export function ExpandIcon({ size = 14, stroke = 'currentColor' }) {
 
 export function CloseIcon({ size = 16, stroke = 'currentColor' }) {
   return <X size={size} color={stroke} weight={W} />
+}
+
+export function CopyIcon({ size = 14, stroke = 'currentColor' }) {
+  return <Copy size={size} color={stroke} weight={W} />
 }
