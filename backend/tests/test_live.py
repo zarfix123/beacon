@@ -53,3 +53,18 @@ async def test_live_synthesis_cites_and_grounds():
     answer = await synthesize("Who changed the rate limit on the payments path and what is it now?", items, [])
     assert answer and "[1]" in answer and "[2]" in answer       # inline numbered citations
     assert "60" in answer and "30" in answer                     # grounded in the supplied facts
+
+
+@requires_key
+async def test_live_synthesis_streams_tokens():
+    from app.claude.synthesis import synthesize
+    items = [{"answer": "The gateway rate limit was lowered to 60 req/min during the retry refactor.",
+              "source_party": "Northwind Robotics", "source_doc_title": "RetryPolicy.md",
+              "decision": "full", "verified": True, "chunk_id": "nw_c1", "source_agent_id": "agent_northwind"}]
+    deltas = []
+    async def on_delta(text):
+        deltas.append(text)
+    answer = await synthesize("What is the rate limit now?", items, [], on_delta=on_delta)
+    assert len(deltas) >= 2                                       # actually streamed in pieces
+    assert "".join(deltas).strip() == answer.strip()             # deltas reconstruct the answer
+    assert answer and "60" in answer

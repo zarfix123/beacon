@@ -10,7 +10,7 @@
  * component's mock source for these fields and it renders live.
  *
  * Returned state:
- *   phase       'idle' | 'searching' | 'done'
+ *   phase       'idle' | 'searching' | 'synthesizing' | 'done'   ('synthesizing' = answer streaming)
  *   connected   bool
  *   queryId     string | null
  *   agents      [{ agent_id, party_name, status }]      // from agent-activated (the nodes)
@@ -66,6 +66,14 @@ function reducer(state, action) {
           // upsert by chunk_id so a grant-access re-stream flips the ONE card in place
           return { ...state, rawEvents,
                    cardsById: { ...state.cardsById, [f.chunk_id]: f } }
+        case 'synthesizing':
+          // fan-out done; the answer is about to stream. Reset answer (also covers the
+          // grant-access re-stream re-composing the answer on the same query_id).
+          return { ...state, rawEvents, phase: 'synthesizing', answer: '' }
+        case 'answer-delta':
+          // append streamed tokens -> r.answer grows live, no component change needed
+          return { ...state, rawEvents, phase: 'synthesizing',
+                   answer: (state.answer || '') + (f.delta || '') }
         case 'done':
           return { ...state, rawEvents, phase: 'done',
                    answer: f.synthesized_answer, provenance: f.provenance || [],

@@ -49,7 +49,7 @@ def collector_sink():
 
 @pytest.fixture(autouse=True)
 def _stub_synth(monkeypatch):
-    async def fake_synth(query, items, redacted):
+    async def fake_synth(query, items, redacted, on_delta=None):
         return "ANSWER [1]"
     monkeypatch.setattr("app.orchestrator.orchestrator.synthesize", fake_synth)
 
@@ -61,10 +61,12 @@ async def test_run_emits_one_done_provenance_excludes_denied(collector_sink):
                         run_registry=RunRegistry())
     await orch.run("q", "asker", query_id="qid")
 
-    assert len(events) == 1
-    done = events[0]
-    assert done["type"] == "done" and done["query_id"] == "qid"
-    assert done["item_count"] == 3                       # all items (incl denied)
+    done_events = [e for e in events if e["type"] == "done"]
+    assert len(done_events) == 1                          # exactly one done
+    assert "synthesizing" in [e["type"] for e in events]  # streamed-answer marker emitted
+    done = done_events[0]
+    assert done["query_id"] == "qid"
+    assert done["item_count"] == 3                        # all items (incl denied)
     assert [p["decision"] for p in done["provenance"]] == ["full", "redacted"]  # denied excluded; order = full,redacted
     assert done["synthesized_answer"] == "ANSWER [1]"
 
@@ -88,6 +90,27 @@ async def test_targeted_replay_reuses_cache(collector_sink):
     assert done2["item_count"] == 2                       # p1 (cached) + p2 (fresh)
     pairs = {(p["source_agent_id"], p["decision"]) for p in done2["provenance"]}
     assert pairs == {("p1", "full"), ("p2", "full")}      # the granted chunk is now full
+
+
+async def test_run_streams_answer_deltas(collector_sink, monkeypatch):
+    events, sink = collector_sink
+
+    async def streaming_synth(query, items, redacted, on_delta=None):
+        for tok in ["The ", "answer", "."]:
+            if on_delta:
+                await on_delta(tok)
+        return "The answer."
+
+    monkeypatch.setattr("app.orchestrator.orchestrator.synthesize", streaming_synth)
+    orch = Orchestrator(registry=None, router=FakeRouter(lambda only: [_it("p1", "full")]),
+                        emit=sink, run_registry=RunRegistry())
+    await orch.run("q", "asker", query_id="qid")
+
+    types = [e["type"] for e in events]
+    deltas = [e["delta"] for e in events if e["type"] == "answer-delta"]
+    assert "".join(deltas) == "The answer."                       # tokens streamed in order
+    assert types.index("synthesizing") < types.index("answer-delta") < types.index("done")
+    assert events[-1]["type"] == "done" and events[-1]["synthesized_answer"] == "The answer."
 
 
 async def test_run_guarded_emits_done_on_error(collector_sink):

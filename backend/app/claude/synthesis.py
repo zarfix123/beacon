@@ -8,7 +8,9 @@ fails SOFT to a deterministic string so the orchestrator's `done` event always e
 """
 from __future__ import annotations
 
-from app.claude.client import SYNTH_MODEL, complete_text
+from typing import Awaitable, Callable, Optional
+
+from app.claude.client import SYNTH_MODEL, complete_text, stream_text
 from app.claude.prompts import SYNTHESIS_SYSTEM, synthesis_user
 from app.models import ResponseItem
 
@@ -30,10 +32,15 @@ async def synthesize(
     query: str,
     items: list[ResponseItem],       # verified == True, decision == full
     redacted: list[ResponseItem],    # restricted gists, surfaced as access asks
+    on_delta: Optional[Callable[[str], Awaitable[None]]] = None,
 ) -> str:
     """Compose the final cited answer from verified full items (SYNTH_MODEL,
     max_tokens~300). Redacted items appear as existence-only. Empty-input guard
-    returns a graceful string; refusal/error -> deterministic fallback."""
+    returns a graceful string; refusal/error -> deterministic fallback.
+
+    When `on_delta` is given, the answer STREAMS: each text delta is forwarded to on_delta
+    as it generates (the orchestrator turns those into answer-delta WS events), and the full
+    text is still returned. Without it, a single non-streaming call (used by tests)."""
     if not items and not redacted:
         return _EMPTY
 
@@ -46,14 +53,15 @@ async def synthesize(
         {"source_party": i["source_party"], "source_doc_title": i.get("source_doc_title")}
         for i in redacted
     ]
+    user = synthesis_user(query=query, verified_facts=verified_facts, redacted=redacted_facts)
 
     try:
-        text = await complete_text(
-            model=SYNTH_MODEL,
-            system=SYNTHESIS_SYSTEM,
-            user=synthesis_user(query=query, verified_facts=verified_facts, redacted=redacted_facts),
-            max_tokens=320,
-        )
+        if on_delta is not None:
+            text = await stream_text(model=SYNTH_MODEL, system=SYNTHESIS_SYSTEM, user=user,
+                                     on_delta=on_delta, max_tokens=320)
+        else:
+            text = await complete_text(model=SYNTH_MODEL, system=SYNTHESIS_SYSTEM, user=user,
+                                       max_tokens=320)
     except Exception:
         text = None
 

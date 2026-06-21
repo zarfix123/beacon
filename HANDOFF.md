@@ -28,7 +28,7 @@ don't touch the backend.
 
 ```js
 const r = useRelayQuery()
-// r.phase        'idle' | 'searching' | 'done'
+// r.phase        'idle' | 'searching' | 'synthesizing' | 'done'   ('synthesizing' = answer streaming)
 // r.connected    bool
 // r.agents       [{ agent_id, party_name, status }]      // the nodes that lit up
 // r.cards        [{ chunk_id, source_agent_id, source_party, decision, answer,
@@ -61,6 +61,10 @@ const r = useRelayQuery()
   for the granted party on the same socket. The hook upserts `cards` by `chunk_id`, so the one
   card flips redacted→full✓ in place. **Animate only the changed card — do NOT treat it as a
   full restart.** `r.provenance` from the new `done` is the source of truth for the answer panel.
+- **The answer STREAMS.** During `phase === 'synthesizing'`, `r.answer` grows token-by-token;
+  `done` then sets the final authoritative text. Just render `r.answer` (it updates live) and
+  show a "synthesizing…" affordance on that phase — never a silent spinner. Streams on both the
+  query and the grant-access re-stream.
 - **Handle the empty state.** Some queries return **zero cards** (no-hit) — nodes pulse, no
   cards, `r.answer` = "No party returned a verified answer…". Don't assume cards always exist.
 - **No mock parser to reconcile** — build straight to the live hook shape. Cleaner than diffing

@@ -120,3 +120,37 @@ async def call_tool(
         return None
     block = _first_block(resp.content, "tool_use")
     return dict(block.input) if block is not None else None
+
+
+async def stream_text(
+    *,
+    model: str,
+    system: str,
+    user: str,
+    on_delta,
+    max_tokens: int = 320,
+    cache_system: bool = True,
+) -> Optional[str]:
+    """Streaming one-shot completion: awaits `on_delta(text)` for each text delta as it
+    arrives, and returns the full accumulated text (or None on refusal/empty).
+
+    Same call rules as complete_text (no sampling params / no thinking). Used by synthesis so
+    the user-facing answer streams to the UI token-by-token instead of landing after a
+    multi-second wait — the hero beat reads as alive, not hung.
+    """
+    client = get_client()
+    system_arg = cached_system_block(system) if cache_system else system
+    parts: list[str] = []
+    async with client.messages.stream(
+        model=model,
+        max_tokens=max_tokens,
+        system=system_arg,
+        messages=[{"role": "user", "content": user}],
+    ) as stream:
+        async for text in stream.text_stream:
+            parts.append(text)
+            await on_delta(text)
+        final = await stream.get_final_message()
+    if final.stop_reason == "refusal":
+        return None
+    return "".join(parts) if parts else None

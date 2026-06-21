@@ -108,7 +108,19 @@ class Orchestrator:
         # line up 1:1 with done.provenance for the answer panel.
         provenance = verified_full + redacted
 
-        answer = await synthesize(query, verified_full, redacted)
+        async def _on_delta(delta: str) -> None:
+            await self._emit({"type": "answer-delta", "query_id": query_id, "delta": delta})
+
+        # Stream the answer token-by-token so the hero beat reads as alive, not a silent
+        # spinner (this is the run BOTH the query and grant-access replay go through). The
+        # `synthesizing` marker lets the UI show a live state before the first token; `done`
+        # still carries the final authoritative answer + provenance.
+        if verified_full or redacted:
+            await self._emit({"type": "synthesizing", "query_id": query_id})
+            answer = await synthesize(query, verified_full, redacted, on_delta=_on_delta)
+        else:
+            answer = await synthesize(query, verified_full, redacted)   # empty -> instant guard
+
         await self._emit(_done_event(query_id, answer, provenance, len(items)))
 
     async def run_guarded(
