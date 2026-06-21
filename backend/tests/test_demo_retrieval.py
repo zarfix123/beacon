@@ -22,12 +22,14 @@ requires_seed = pytest.mark.skipif(
 _EXPECTED = {
     "agent_northwind": {"northwind_demo_gateway", "northwind_demo_runbook"},
     "agent_quanta": {"quanta_demo_throttle", "quanta_demo_notes"},
+    "agent_helios": {"helios_demo_dashboard"},
 }
 _TIERS = {
     "northwind_demo_gateway": "public",
     "northwind_demo_runbook": "private",
     "quanta_demo_throttle": "restricted",
     "quanta_demo_notes": "public",
+    "helios_demo_dashboard": "public",
 }
 
 

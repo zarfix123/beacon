@@ -196,19 +196,22 @@ def _relevance(u: QAUnit) -> float:
     return kw + length_score
 
 
-def select_chunks(units: list[QAUnit], max_chunks: int) -> list[QAUnit]:
+def select_chunks(units: list[QAUnit], max_chunks: int,
+                  max_per_title: int = 2, loose: bool = False) -> list[QAUnit]:
     clean = [u for u in units if not is_noise(u)]
-    # Dedupe by normalized-question (collapses re-asks) and by 40-char prefix;
-    # cap repeats of any single doc_title so one topic can't flood the corpus.
+    # Dedupe by normalized-question (always — collapses exact re-asks). The 40-char-prefix
+    # dedupe and per-title cap are the aggressive ones; `loose` drops the prefix dedupe and
+    # `max_per_title` raises the cap so a fuller corpus survives (noise + secret filters stay).
     seen_q, seen_prefix, title_count, deduped = set(), set(), {}, []
-    MAX_PER_TITLE = 2
     for u in clean:
         key = u.question.lower()
         prefix = key[:40]
         tkey = u.doc_title.lower()
-        if key in seen_q or prefix in seen_prefix:
+        if key in seen_q:
             continue
-        if title_count.get(tkey, 0) >= MAX_PER_TITLE:
+        if not loose and prefix in seen_prefix:
+            continue
+        if title_count.get(tkey, 0) >= max_per_title:
             continue
         seen_q.add(key)
         seen_prefix.add(prefix)
@@ -246,7 +249,8 @@ def iter_cc_sessions(party_root: pathlib.Path):
 
 
 def ingest_party(party: str, agent_id: str, max_chunks: int,
-                 raw_root: pathlib.Path, website_only: bool) -> pathlib.Path:
+                 raw_root: pathlib.Path, website_only: bool,
+                 max_per_title: int = 2, loose: bool = False) -> pathlib.Path:
     party_root = raw_root / party
     units: list[QAUnit] = []
 
@@ -258,7 +262,7 @@ def ingest_party(party: str, agent_id: str, max_chunks: int,
     if website.exists():
         units.extend(read_website_conversations(website))
 
-    selected = select_chunks(units, max_chunks)
+    selected = select_chunks(units, max_chunks, max_per_title=max_per_title, loose=loose)
 
     # Assign one parent_doc per distinct source, chunk_id sequential.
     doc_index: dict[str, int] = {}
@@ -290,10 +294,15 @@ def main() -> None:
     ap.add_argument("--party", required=True, help="raw data folder under data/raw/ (e.g. dennis)")
     ap.add_argument("--agent-id", required=True, help="target agent id (e.g. agent_northwind)")
     ap.add_argument("--max-chunks", type=int, default=25, help="cap on kept chunks (default 25)")
+    ap.add_argument("--max-per-title", type=int, default=2,
+                    help="max chunks sharing one doc_title (default 2; raise for a fuller corpus)")
+    ap.add_argument("--loose", action="store_true",
+                    help="drop the 40-char-prefix dedupe (keep exact-question dedupe + noise/secret filters)")
     ap.add_argument("--website-only", action="store_true", help="skip Claude Code transcripts")
     ap.add_argument("--raw-root", type=pathlib.Path, default=DEFAULT_RAW_ROOT)
     args = ap.parse_args()
-    ingest_party(args.party, args.agent_id, args.max_chunks, args.raw_root, args.website_only)
+    ingest_party(args.party, args.agent_id, args.max_chunks, args.raw_root, args.website_only,
+                 max_per_title=args.max_per_title, loose=args.loose)
 
 
 if __name__ == "__main__":

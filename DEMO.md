@@ -22,7 +22,8 @@ set in the environment, not just `.env`):
 
 - **UI:** http://localhost:5173 (the visual shell) — or http://localhost:5173/?debug for the
   walking-skeleton client (raw event stream; the guaranteed-working fallback).
-- **Asker:** `agent_helios` (excluded from fan-out) → responders are **Northwind** + **Quanta**.
+- **Asker:** `agent_you` — the "You" node, NOT a party, so it's excluded from the fan-out and
+  all three parties respond: **Northwind**, **Helios**, **Quanta**.
 
 ## Reset between takes
 
@@ -37,19 +38,19 @@ A fresh `run.sh` (server restart) is the can't-fail hard reset (reloads disk tie
 
 ## The retrieval, by the numbers
 
-Real data, re-ingested at volume (`scripts/ingest.py`, deduped): **~1,440 chunks** indexed
-(Northwind 439, Quanta 437, Helios 561). Each party searches its own index, isolated.
+Real data, re-ingested at volume (`scripts/ingest.py --loose`): **~4,335 chunks** indexed
+(Northwind 1,240, Helios 1,519, Quanta 1,576). Each party searches its own index, isolated.
 
 | engine | latency (per search) | notes |
 |---|---|---|
 | cosine (dense) | ~4 ms | brute-force numpy, no GPU |
-| **hybrid (used)** | **~16 ms** | BM25 + dense + RRF; paraphrase-robust |
+| **hybrid (used)** | **~10–18 ms** | BM25 + dense + RRF; paraphrase-robust |
 | keyword stub | ~112 ms | Phase-1 placeholder, not used |
 
 Accuracy (self-retrieval): hybrid **recall@5 ≈ 97%**, recall@1 ≈ 85%, MRR ≈ 0.90.
-Embedding all chunks is a one-time **~3 s** offline step (cached to `embeddings.npz`); startup
-loads the cache + pre-warms BM25 so the first live query is snappy. **"1,440 docs searched in
-~16 ms, no GPU."**
+Embedding all chunks is a one-time **~4 s** offline step (cached to `embeddings.npz`); startup
+loads the cache + pre-warms BM25 so the first live query is snappy. **"4,300+ docs searched in
+~10–18 ms, no GPU."**
 
 ## The three demo scenarios (all verified live)
 
@@ -60,6 +61,7 @@ which gives three distinct behaviors:
 > **We're seeing 429s on checkout — who changed the rate limit on the payments path, and what is it now?**
 
 - **Northwind** → `billing-svc/RetryPolicy.md` **full ✓** (gateway lowered to 60 req/min, reverts 16:00) + `payments/incident-runbook.md` **denied** (Data team owns it).
+- **Helios** → `observability/checkout-429-dashboard.md` **full ✓** (the 429 spike correlates with the change).
 - **Quanta** → `auth-core/throttle.yaml` **redacted** (30 req/min, security-scoped) + `auth-core/README.md` **full ✓**.
 - Synthesis answers who/what-now and surfaces the restricted item as "request access."
 - **Hero:** click **Request access** on the throttle card → targeted re-stream → that one card flips **redacted → full ✓** and the answer updates. (Only that card re-streams.)
@@ -68,12 +70,13 @@ which gives three distinct behaviors:
 > domain-disjoint, so the money moment is seeded for reliability. Everything else is real data.
 
 ### 2. Single-hit — one party has it
-> **Next.js authentication flow for teachers and students in the Tolus app**  → only **Northwind** answers (real auth chunks); Quanta stays silent.
-
-> **evaluate my Harvard college admissions supplemental essay**  → only **Quanta** answers (real essay chunks); Northwind stays silent.
+> **Next.js authentication flow for teachers and students in the Tolus app**  → only **Northwind** answers (real auth chunks); the others stay silent. (Cleanest single-hit at this scale.)
 
 ### 3. No-hit — nobody has it
-> **what is the best recipe for chocolate chip cookies**  (or *cheapest flights to Tokyo*) → nodes pulse, **no cards**, answer = *"No party returned a verified answer to this question."* No hallucination.
+> **what is the best recipe for chocolate chip cookies**  (or *what are the lyrics to a Taylor Swift song*) → nodes pulse, **no cards**, answer = *"No party returned a verified answer to this question."* No hallucination.
+
+> At ~4,300 chunks the corpus is broad, so pick genuinely off-domain topics for no-hit
+> (cooking, song lyrics, knitting, sports rules) — "travel" now hits a real Seoul trip chunk.
 
 ## What's where
 

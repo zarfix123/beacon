@@ -41,7 +41,7 @@ class Settings:
     )
     agents_path: str = "app/data/agents.json"
     corpora_dir: str = "app/data/corpora"
-    default_asker: str = "agent_helios"     # OQ-1: locked demo asker (clean 2-party fan-out)
+    default_asker: str = "agent_you"        # the "You" node (not a party) -> all 3 parties respond
     top_k: int = 5                          # passed to search(); small for low verify latency
 
     # Claude model ids (BUILD_INDEX.md §2.1 model-id note / OQ-6).

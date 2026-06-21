@@ -38,8 +38,8 @@ def _drain_until_done(ws, cap: int = 60) -> list[dict]:
 def test_post_query_returns_ids(client):
     body = client.post("/query", json={"query": "servo jitter"}).json()
     assert body["query_id"].startswith("q_")
-    assert body["from_agent"] == "agent_helios"           # settings.default_asker
-    assert set(body["agents"]) == {"fix_a", "fix_b"}       # asker excluded (not a party here)
+    assert body["from_agent"] == "agent_you"              # settings.default_asker (the "You" node)
+    assert set(body["agents"]) == {"fix_a", "fix_b"}       # asker is not a party -> all parties respond
 
 
 def test_ws_query_streams_full_cycle(client):

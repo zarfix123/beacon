@@ -10,8 +10,10 @@ Single source of truth shared by:
                                     rehearsal takes (grant-access flips one to public live;
                                     this re-arms it without a server restart)
 
-Topology: asker = agent_helios (excluded from fan-out). Responders = northwind + quanta:
-  northwind -> {public full, private denied},  quanta -> {public full, restricted redacted}.
+Topology: asker = agent_you (the "You" node, not a party — excluded from fan-out), so ALL
+THREE parties respond:
+  northwind -> {public full, private denied},  quanta -> {public full, restricted redacted},
+  helios    -> {public full} (the observability angle on the 429s).
 Every text overlaps the demo query's distinctive tokens (429, rate limit, payments, checkout,
 throttle, req/min) so the planted chunks rank top-2 under hybrid retrieval, out-ranking the
 off-topic real chunks.
@@ -76,6 +78,19 @@ DEMO_CHUNKS: list[dict] = [
             "in addition to the billing gateway's rate limit. The exact threshold is managed by the "
             "security team in throttle.yaml; contact them for the current value or to request a "
             "temporary increase to relieve checkout 429s."
+        ),
+    },
+    {
+        "chunk_id": "helios_demo_dashboard",
+        "parent_doc_id": "helios_demo",
+        "doc_title": "observability/checkout-429-dashboard.md",
+        "owner": "agent_helios",
+        "visibility": "public",
+        "text": (
+            "The checkout 429 rate on the payments path is tracked on the gateway-throttle "
+            "dashboard. The spike correlates exactly with the recent gateway rate-limit change to "
+            "60 requests/minute and clears when the limit reverts at 16:00 UTC. On-call should not "
+            "page for these expected 429s during the retry-queue refactor window."
         ),
     },
 ]
